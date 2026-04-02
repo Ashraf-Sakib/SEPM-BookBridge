@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h2 style="margin-bottom:8px">
+        Welcome, <span sec:authentication="name">User</span>
+    </h2>
+    <p style="color:#718096;margin-bottom:32px">
+        What would you like to do today?
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+
+        <a href="/books" style="text-decoration:none">
+            <div style="background:#fff;border-radius:10px;padding:24px;
+                        border:1.5px solid #e2e8f0;cursor:pointer;
+                        transition:box-shadow .2s">
+                <div style="font-size:28px;margin-bottom:10px">📚</div>
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">
+                    Browse Books</div>
+                <div style="font-size:13px;color:#718096">
+                    Find second-hand books to buy</div>
+            </div>
+        </a>
+
+        <a href="/seller/books/new" style="text-decoration:none">
+            <div style="background:#fff;border-radius:10px;padding:24px;
+                        border:1.5px solid #e2e8f0;cursor:pointer">
+                <div style="font-size:28px;margin-bottom:10px">➕</div>
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">
+                    List a Book</div>
+                <div style="font-size:13px;color:#718096">
+                    Sell your old books</div>
+            </div>
+        </a>
+
+        <a href="/orders" style="text-decoration:none">
+            <div style="background:#fff;border-radius:10px;padding:24px;
+                        border:1.5px solid #e2e8f0;cursor:pointer">
+                <div style="font-size:28px;margin-bottom:10px">🛒</div>
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">
+                    My Orders</div>
+                <div style="font-size:13px;color:#718096">
+                    View your purchase history</div>
+            </div>
+        </a>
+
+        <!-- Only visible to ADMIN -->
+        <a href="/admin" sec:authorize="hasRole('ADMIN')"
+           style="text-decoration:none">
+            <div style="background:#fff;border-radius:10px;padding:24px;
+                        border:1.5px solid #fed7d7;cursor:pointer">
+                <div style="font-size:28px;margin-bottom:10px">⚙️</div>
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">
+                    Admin Panel</div>
+                <div style="font-size:13px;color:#718096">
+                    Manage users and listings</div>
+            </div>
+        </a>
+
+    </div>
+</div>
+
+</body>
+</html>
