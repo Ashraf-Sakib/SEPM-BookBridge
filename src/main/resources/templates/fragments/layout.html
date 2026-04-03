@@ -9,8 +9,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
         sans-serif; background: #f5f5f5; color: #333; }
-
-        /* Navbar */
         nav { background: #2d3748; padding: 0 24px;
             display: flex; align-items: center;
             justify-content: space-between; height: 56px; }
@@ -25,66 +23,47 @@
         nav .btn-nav { background: #48bb78; color: #fff !important;
             font-weight: 500; }
         nav .btn-nav:hover { background: #38a169 !important; }
-
-        /* Page container */
         .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
-
-        /* Auth card */
         .auth-card { background: #fff; border-radius: 12px;
             padding: 40px; max-width: 440px;
             margin: 60px auto; box-shadow: 0 2px 16px rgba(0,0,0,.08); }
         .auth-card h2 { font-size: 24px; margin-bottom: 8px; color: #1a202c; }
         .auth-card .subtitle { color: #718096; font-size: 14px; margin-bottom: 28px; }
-
-        /* Form */
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; font-size: 13px;
-            font-weight: 500; color: #4a5568;
-            margin-bottom: 6px; }
+            font-weight: 500; color: #4a5568; margin-bottom: 6px; }
         .form-group input { width: 100%; padding: 10px 14px;
             border: 1.5px solid #e2e8f0; border-radius: 8px;
-            font-size: 14px; outline: none;
-            transition: border .2s; }
+            font-size: 14px; outline: none; transition: border .2s; }
         .form-group input:focus { border-color: #48bb78; }
         .field-error { color: #e53e3e; font-size: 12px; margin-top: 4px; }
-
-        /* Buttons */
         .btn { width: 100%; padding: 11px; border: none;
             border-radius: 8px; font-size: 15px;
             font-weight: 600; cursor: pointer; transition: background .2s; }
         .btn-primary { background: #48bb78; color: #fff; }
         .btn-primary:hover { background: #38a169; }
-
-        /* Alerts */
         .alert { padding: 12px 16px; border-radius: 8px;
             font-size: 13px; margin-bottom: 20px; }
         .alert-error { background: #fff5f5; color: #c53030;
             border: 1px solid #fed7d7; }
         .alert-success { background: #f0fff4; color: #276749;
             border: 1px solid #c6f6d5; }
-
-        /* Auth link */
         .auth-link { text-align: center; margin-top: 20px;
             font-size: 13px; color: #718096; }
         .auth-link a { color: #48bb78; font-weight: 500;
             text-decoration: none; }
     </style>
 </head>
+<body>
 
 <nav th:fragment="navbar">
     <a class="brand" href="/"><span>Book</span>Bridge</a>
     <div class="nav-links">
         <a href="/books">Browse Books</a>
-        <!-- Show these only when NOT logged in -->
-        <a href="/login"
-           sec:authorize="isAnonymous()">Login</a>
-        <a href="/register" class="btn-nav"
-           sec:authorize="isAnonymous()">Register</a>
-        <!-- Show these only when logged in -->
-        <a href="/dashboard"
-           sec:authorize="isAuthenticated()">Dashboard</a>
-        <a href="/admin"
-           sec:authorize="hasRole('ADMIN')">Admin</a>
+        <a href="/login" sec:authorize="isAnonymous()">Login</a>
+        <a href="/register" class="btn-nav" sec:authorize="isAnonymous()">Register</a>
+        <a href="/dashboard" sec:authorize="isAuthenticated()">Dashboard</a>
+        <a href="/admin" sec:authorize="hasRole('ADMIN')">Admin</a>
         <form th:action="@{/logout}" method="post"
               sec:authorize="isAuthenticated()"
               style="margin:0">
@@ -96,3 +75,6 @@
         </form>
     </div>
 </nav>
+
+</body>
+</html>

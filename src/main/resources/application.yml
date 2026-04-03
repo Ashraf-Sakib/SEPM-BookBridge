@@ -3,19 +3,23 @@ spring:
     name: bookbridge
 
   datasource:
-    url: jdbc:h2:file:./data/bookbridge
-    username: sa
-    password: 
-    driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://localhost:50264/mydatabase
+    username: myuser
+    password: admin123
+    driver-class-name: org.postgresql.Driver
+
+  h2:
+    console:
+      enabled: true
 
   jpa:
     hibernate:
-      ddl-auto: update   # automatically create/update tables
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.H2Dialect   # match your actual DB
 
   servlet:
     multipart:
@@ -23,11 +27,11 @@ spring:
       max-request-size: 10MB
 
 server:
-  port: 8081
+  port: 8082
 
 bookbridge:
   cors:
     allowed-origins: http://localhost:5173,http://localhost:3000
   jwt:
     secret: ${JWT_SECRET:your-256-bit-secret-change-in-production}
-    expiration-ms: 86400000  # 24 hours
+    expiration-ms: 86400000

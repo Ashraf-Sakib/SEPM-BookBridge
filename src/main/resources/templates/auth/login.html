@@ -27,11 +27,7 @@
          th:text="${logoutMessage}">
     </div>
 
-    <!--
-        Spring Security handles POST /login automatically.
-        You do NOT need a controller method for this POST.
-        Just make sure action="/login" and method="post".
-    -->
+
     <form th:action="@{/login}" method="post">
 
         <!-- CSRF token — Spring Security requires this on every form POST -->
