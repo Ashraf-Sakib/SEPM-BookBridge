@@ -9,24 +9,14 @@
     <h2>Create account</h2>
     <p class="subtitle">Join BookBridge — buy and sell second-hand books</p>
 
-    <!-- Server-side error (username/email taken) -->
     <div class="alert alert-error"
          th:if="${errorMessage}"
          th:text="${errorMessage}">
     </div>
 
-    <!--
-        th:object binds to the RegisterRequest we added in the controller.
-        th:field binds each input to the DTO field.
-        th:errors shows validation errors per field.
-    -->
     <form th:action="@{/register}"
           th:object="${registerRequest}"
           method="post">
-
-        <input type="hidden"
-               th:name="${_csrf.parameterName}"
-               th:value="${_csrf.token}"/>
 
         <div class="form-group">
             <label for="username">Username</label>
@@ -35,7 +25,6 @@
                    th:field="*{username}"
                    placeholder="Choose a username"
                    autofocus/>
-            <!-- Shows @Size / @NotBlank error messages from DTO -->
             <div class="field-error"
                  th:if="${#fields.hasErrors('username')}"
                  th:errors="*{username}">
