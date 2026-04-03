@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #e5ddd5;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 30%;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .chat-item:hover {
+            background: #f5f5f5;
+        }
+
+        /* Chat area */
+        .chat-box {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 15px;
+            background: #075e54;
+            color: white;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            max-width: 60%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .sent {
+            background: #dcf8c6;
+            margin-left: auto;
+        }
+
+        .received {
+            background: white;
+        }
+
+        .input-box {
+            display: flex;
+            padding: 10px;
+            background: #f0f0f0;
+        }
+
+        .input-box input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+        }
+
+        .input-box button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            border: none;
+            background: #075e54;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="chat-item" th:each="conv : ${conversations}"
+             th:onclick="|window.location='/chat/' + ${conv.id}|">
+            <b th:text="${conv.book.title}">Book</b>
+            <p th:text="${conv.response != null ? conv.response : conv.message}"></p>
+        </div>
+    </div>
+
+    <!-- Chat Box -->
+    <div class="chat-box">
+
+        <div class="chat-header">
+            <h3 th:text="${activeUser}">Conversation</h3>
+        </div>
+
+        <div th:if="${conversation != null}" style="padding: 16px 20px 0 20px; background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+            <div style="margin-bottom: 12px;">
+                <div style="font-size: 12px; color: #6b7280; margin-bottom: 6px;">Initial message</div>
+                <div class="message received" style="max-width: none; margin-bottom: 0;" th:text="${conversation.message}"></div>
+            </div>
+            <div th:if="${conversation.response != null}" style="margin-bottom: 12px;">
+                <div style="font-size: 12px; color: #6b7280; margin-bottom: 6px;">Response</div>
+                <div class="message sent" style="max-width: none; margin-bottom: 0;" th:text="${conversation.response}"></div>
+            </div>
+        </div>
+
+        <div class="messages" id="messages" th:if="${conversation != null}">
+            <div th:each="msg : ${messages}"
+                 th:classappend="${msg.sender.id == currentUserId} ? 'message sent' : 'message received'">
+                <small style="display:block; font-size: 11px; color: #6b7280; margin-bottom: 4px;"
+                       th:text="${msg.sender.username}"></small>
+                <span th:text="${msg.content}"></span>
+            </div>
+        </div>
+
+        <div class="messages" th:if="${conversation == null}">
+            <p style="color:#718096;">Select a conversation to continue the discussion.</p>
+        </div>
+
+        <form class="input-box" th:if="${conversation != null}" th:action="@{/chat/{id}/message(id=${conversationId})}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="text" name="content" placeholder="Type a message" required />
+            <button type="submit">Send</button>
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+<script>
+    const messages = document.getElementById('messages');
+    if (messages) {
+        messages.scrollTop = messages.scrollHeight;
+    }
+</script>

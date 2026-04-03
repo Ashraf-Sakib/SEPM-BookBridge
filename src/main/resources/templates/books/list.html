@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Browse Books')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h2 style="margin-bottom:8px;color:#1a202c">Browse Books</h2>
+    <p style="color:#718096;margin-bottom:24px">
+        Discover second-hand books from the community.
+    </p>
+
+    <form method="get" action="/books"
+          style="display:grid;grid-template-columns:2fr 2fr auto;gap:12px;margin-bottom:24px">
+        <input type="text" name="title" placeholder="Search by title"
+               th:value="${title}"
+               style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px"/>
+        <input type="text" name="author" placeholder="Search by author"
+               th:value="${author}"
+               style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px"/>
+        <button type="submit"
+                style="background:#48bb78;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer">
+            Search
+        </button>
+    </form>
+
+    <div th:if="${#lists.isEmpty(books)}"
+         style="background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:24px;color:#4a5568">
+        No books found for your search.
+    </div>
+
+    <div th:if="${!#lists.isEmpty(books)}"
+         style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">
+        <article th:each="book : ${books}"
+                 style="background:#fff;border-radius:10px;border:1.5px solid #e2e8f0;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <h3 th:text="${book.title}" style="font-size:18px;color:#1a202c">Book title</h3>
+            <p style="font-size:14px;color:#4a5568">
+                By <span th:text="${book.author ?: 'Unknown author'}">Author</span>
+            </p>
+            <p th:text="${book.description ?: 'No description available.'}"
+               style="font-size:13px;color:#718096;line-height:1.4;flex:1">Description</p>
+            <p style="font-size:13px;color:#4a5568">
+                Added by <strong th:text="${book.addedBy}">user</strong>
+            </p>
+        </article>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px"
+         th:if="${totalPages > 0}">
+        <a th:if="${!first}"
+           th:href="@{/books(page=${pageNumber - 1},size=${size},title=${title},author=${author})}"
+           style="text-decoration:none;color:#2d3748;border:1px solid #cbd5e0;padding:8px 12px;border-radius:8px">
+            Previous
+        </a>
+        <span th:if="${first}"></span>
+
+        <span style="font-size:14px;color:#4a5568"
+              th:text="'Page ' + (${pageNumber} + 1) + ' of ' + ${totalPages}">Page</span>
+
+        <a th:if="${!last}"
+           th:href="@{/books(page=${pageNumber + 1},size=${size},title=${title},author=${author})}"
+           style="text-decoration:none;color:#2d3748;border:1px solid #cbd5e0;padding:8px 12px;border-radius:8px">
+            Next
+        </a>
+        <span th:if="${last}"></span>
+    </div>
+</div>
+
+</body>
+</html>

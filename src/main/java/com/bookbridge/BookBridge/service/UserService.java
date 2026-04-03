@@ -2,6 +2,7 @@ package com.bookbridge.BookBridge.service;
 
 import com.bookbridge.BookBridge.dto.response.UserResponse;
 import com.bookbridge.BookBridge.entity.User;
+import com.bookbridge.BookBridge.exception.ResourceNotFoundException;
 import com.bookbridge.BookBridge.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,20 +18,20 @@ public class UserService {
     public UserResponse getUserById(Integer userId) {
         return userRepository.findById(userId)
                 .map(this::convertToResponse)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional(readOnly = true)
     public UserResponse getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .map(this::convertToResponse)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional
     public UserResponse updateUser(Integer userId, User userDetails) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (userDetails.getEmail() != null) {
             user.setEmail(userDetails.getEmail());
@@ -46,7 +47,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Integer userId) {
         if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
         userRepository.deleteById(userId);
     }

@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,14 +24,12 @@ public class Role {
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 20)
     private RoleName name;
 
-    private String description;
-
     public enum RoleName {
-        ADMIN,
-        USER,
-        MODERATOR
+        ROLE_ADMIN,
+        ROLE_SELLER,
+        ROLE_BUYER
     }
 }

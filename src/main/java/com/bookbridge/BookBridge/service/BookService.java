@@ -4,6 +4,7 @@ import com.bookbridge.BookBridge.dto.response.BookResponse;
 import com.bookbridge.BookBridge.dto.response.PageResponse;
 import com.bookbridge.BookBridge.entity.Book;
 import com.bookbridge.BookBridge.entity.User;
+import com.bookbridge.BookBridge.exception.ResourceNotFoundException;
 import com.bookbridge.BookBridge.repository.BookRepository;
 import com.bookbridge.BookBridge.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class BookService {
     @Transactional
     public BookResponse createBook(Book book, Integer userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         book.setAddedBy(user);
         Book savedBook = bookRepository.save(book);
         return convertToResponse(savedBook);
@@ -34,7 +35,7 @@ public class BookService {
     public BookResponse getBookById(Integer bookId) {
         return bookRepository.findById(bookId)
                 .map(this::convertToResponse)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +59,7 @@ public class BookService {
     @Transactional
     public BookResponse updateBook(Integer bookId, Book bookDetails) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
         if (bookDetails.getTitle() != null) book.setTitle(bookDetails.getTitle());
         if (bookDetails.getDescription() != null) book.setDescription(bookDetails.getDescription());
@@ -77,7 +78,7 @@ public class BookService {
     @Transactional
     public void deleteBook(Integer bookId) {
         if (!bookRepository.existsById(bookId)) {
-            throw new RuntimeException("Book not found");
+            throw new ResourceNotFoundException("Book not found");
         }
         bookRepository.deleteById(bookId);
     }

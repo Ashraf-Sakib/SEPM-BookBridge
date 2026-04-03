@@ -10,71 +10,61 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Controller  // NOT @RestController — returns Thymeleaf view names
+@Controller
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
 
-    // ── Home page ──────────────────────────────────────────
     @GetMapping("/")
     public String home() {
         return "index";
     }
 
-    // ── Show login page ────────────────────────────────────
     @GetMapping("/login")
     public String showLogin(
             @RequestParam(required = false) String error,
             @RequestParam(required = false) String logout,
             Model model) {
-
-        if (error != null) {
+        if (error != null)
             model.addAttribute("errorMessage",
-                    "Incorrect username or password. Please try again.");
-        }
-        if (logout != null) {
+                    "Wrong username or password.");
+        if (logout != null)
             model.addAttribute("logoutMessage",
-                    "You have been logged out successfully.");
-        }
-        return "auth/login"; // → templates/auth/login.html
+                    "Logged out successfully.");
+        return "auth/login";
     }
 
-    // ── Show register page ─────────────────────────────────
     @GetMapping("/register")
     public String showRegister(Model model) {
-        model.addAttribute("registerRequest", new RegisterRequest());
-        return "auth/register"; // → templates/auth/register.html
+        model.addAttribute("registerRequest",
+                new RegisterRequest());
+        return "auth/register";
     }
 
-    // ── Handle register form submit ────────────────────────
     @PostMapping("/register")
     public String handleRegister(
-            @Valid @ModelAttribute("registerRequest") RegisterRequest request,
-            BindingResult bindingResult,
+            @Valid @ModelAttribute("registerRequest")
+            RegisterRequest request,
+            BindingResult result,
             RedirectAttributes redirectAttributes,
             Model model) {
 
-        // If @Valid found errors (blank fields, bad email etc) — show form again
-        if (bindingResult.hasErrors()) {
+        if (result.hasErrors())
             return "auth/register";
-        }
 
         try {
             authService.register(request);
-            // Success — redirect to login with success message
-            redirectAttributes.addFlashAttribute("successMessage",
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
                     "Account created! Please log in.");
             return "redirect:/login";
-
         } catch (IllegalArgumentException e) {
-            // Username or email already taken
             model.addAttribute("errorMessage", e.getMessage());
             return "auth/register";
         }
     }
 
-    // ── Dashboard after login ──────────────────────────────
     @GetMapping("/dashboard")
     public String dashboard() {
         return "dashboard";

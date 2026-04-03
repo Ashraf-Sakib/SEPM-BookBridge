@@ -3,23 +3,23 @@ spring:
     name: bookbridge
 
   datasource:
-    url: jdbc:postgresql://localhost:50264/mydatabase
-    username: myuser
-    password: admin123
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bookbridge}
+    username: ${SPRING_DATASOURCE_USERNAME:bookbridge}
+    password: ${SPRING_DATASOURCE_PASSWORD:bookbridge}
     driver-class-name: org.postgresql.Driver
 
-  h2:
-    console:
-      enabled: true
-
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect   # match your actual DB
+
+  sql:
+    init:
+      mode: always
 
   servlet:
     multipart:
@@ -33,5 +33,5 @@ bookbridge:
   cors:
     allowed-origins: http://localhost:5173,http://localhost:3000
   jwt:
-    secret: ${JWT_SECRET:your-256-bit-secret-change-in-production}
+    secret: ${JWT_SECRET:bookbridge-dev-secret-key-should-be-32-bytes-minimum}
     expiration-ms: 86400000

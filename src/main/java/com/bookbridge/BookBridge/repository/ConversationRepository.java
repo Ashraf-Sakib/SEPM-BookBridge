@@ -9,4 +9,5 @@ import com.bookbridge.BookBridge.entity.Conversation;
 public interface ConversationRepository extends JpaRepository<Conversation, Integer> {
     Page<Conversation> findByBookId(Integer bookId, PageRequest pageRequest);
     Page<Conversation> findByUserId(Integer userId, PageRequest pageRequest);
+    Page<Conversation> findByUserIdOrBookAddedById(Integer userId, Integer addedById, PageRequest pageRequest);
 }
