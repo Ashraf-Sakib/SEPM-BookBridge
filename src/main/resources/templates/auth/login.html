@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Login')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="auth-card">
+    <h2>Welcome back</h2>
+    <p class="subtitle">Sign in to your BookBridge account</p>
+
+    <!-- Error message (wrong password) -->
+    <div class="alert alert-error"
+         th:if="${errorMessage}"
+         th:text="${errorMessage}">
+    </div>
+
+    <!-- Success message (after registration) -->
+    <div class="alert alert-success"
+         th:if="${successMessage}"
+         th:text="${successMessage}">
+    </div>
+
+    <!-- Logout message -->
+    <div class="alert alert-success"
+         th:if="${logoutMessage}"
+         th:text="${logoutMessage}">
+    </div>
+
+    <!--
+        Spring Security handles POST /login automatically.
+        You do NOT need a controller method for this POST.
+        Just make sure action="/login" and method="post".
+    -->
+    <form th:action="@{/login}" method="post">
+
+        <!-- CSRF token — Spring Security requires this on every form POST -->
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text"
+                   id="username"
+                   name="username"
+                   placeholder="Enter your username"
+                   required
+                   autofocus/>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password"
+                   id="password"
+                   name="password"
+                   placeholder="Enter your password"
+                   required/>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Sign In</button>
+    </form>
+
+    <div class="auth-link">
+        Don't have an account? <a href="/register">Create one</a>
+    </div>
+</div>
+
+</body>
+</html>
