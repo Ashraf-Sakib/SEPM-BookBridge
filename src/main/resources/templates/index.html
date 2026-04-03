@@ -6,182 +6,39 @@
 
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-        --green:#2d6a4f;
-        --green-light:#48bb78;
-        --green-pale:#f0faf4;
-        --green-mid:#d1fae5;
-        --ink:#1a202c;
-        --muted:#718096;
-        --border:#e2e8f0;
-        --white:#ffffff;
-    }
-
-    body {
-        font-family: 'DM Sans', sans-serif;
-        background: #f8faf8;
-        color: var(--ink);
-    }
-
-    /* Hero */
-    .bb-hero {
-        max-width: 1140px;
-        margin: 0 auto;
-        padding: 80px 40px;
-    }
-
-    .bb-eyebrow {
-        display: inline-flex;
-        background: var(--green-mid);
-        color: var(--green);
-        font-size: 12px;
-        font-weight: 600;
-        padding: 6px 14px;
-        border-radius: 20px;
-        margin-bottom: 24px;
-    }
-
-    .bb-hero-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 48px;
-        font-weight: 900;
-        margin-bottom: 20px;
-    }
-
-    .bb-hero-sub {
-        font-size: 16px;
-        color: var(--muted);
-        margin-bottom: 30px;
-    }
-
-    .bb-hero-actions { display: flex; gap: 10px; }
-
-    .bb-btn-primary {
-        background: var(--green-light);
-        color: #fff;
-        padding: 12px 24px;
-        border-radius: 6px;
-        text-decoration: none;
-    }
-
-    .bb-btn-secondary {
-        background: #fff;
-        border: 1px solid var(--border);
-        padding: 12px 24px;
-        border-radius: 6px;
-        text-decoration: none;
-        color: var(--ink);
-    }
-
-    /* Section */
-    .bb-section {
-        max-width: 1140px;
-        margin: auto;
-        padding: 60px 40px;
-    }
-
-    .bb-section-title {
-        font-size: 32px;
-        margin-bottom: 40px;
-    }
-
-    .bb-steps {
-        display: grid;
-        grid-template-columns: repeat(3,1fr);
-        gap: 20px;
-    }
-
-    .bb-step {
-        border: 1px solid var(--border);
-        padding: 20px;
-        border-radius: 10px;
-    }
-
-    /* CTA */
-    .bb-cta {
-        background: var(--green);
-        color: white;
-        padding: 40px;
-        border-radius: 12px;
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
-
-    .bb-btn-white {
-        background: white;
-        color: var(--green);
-        padding: 10px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-    }
-</style>
-
-<!-- Hero -->
-<div class="bb-hero">
-    <div class="bb-eyebrow">📖 Book Marketplace</div>
-
-    <h1 class="bb-hero-title">
-        Buy and sell your old books
+<div style="text-align:center;padding:80px 24px 40px">
+    <h1 style="font-size:40px;color:#1a202c;margin-bottom:16px">
+        Buy &amp; Sell Second-Hand Books
     </h1>
-
-    <p class="bb-hero-sub">
-        BookBridge connects book lovers. Give your old books a new home —
-        and find your next great read for less.
+    <p style="font-size:18px;color:#718096;margin-bottom:36px;
+              max-width:500px;margin-left:auto;margin-right:auto">
+        BookBridge connects book lovers. Give your old books a new home.
     </p>
 
-    <div class="bb-hero-actions" sec:authorize="isAnonymous()">
-        <a href="/register" class="bb-btn-primary">Get Started →</a>
-        <a href="/books" class="bb-btn-secondary">Browse Books</a>
+    <!-- Show when not logged in -->
+    <div sec:authorize="isAnonymous()">
+        <a href="/register"
+           style="background:#48bb78;color:#fff;padding:14px 32px;
+                  border-radius:8px;text-decoration:none;font-size:16px;
+                  font-weight:600;margin-right:12px">
+            Get Started
+        </a>
+        <a href="/books"
+           style="background:#fff;color:#4a5568;padding:14px 32px;
+                  border-radius:8px;text-decoration:none;font-size:16px;
+                  font-weight:600;border:1.5px solid #e2e8f0">
+            Browse Books
+        </a>
     </div>
 
-    <div class="bb-hero-actions" sec:authorize="isAuthenticated()">
-        <a href="/dashboard" class="bb-btn-primary">Go to Dashboard →</a>
-    </div>
-</div>
-
-<!-- How it works -->
-<div class="bb-section">
-    <h2 class="bb-section-title">Simple as turning a page.</h2>
-
-    <div class="bb-steps">
-        <div class="bb-step">
-            <h3>📸 List your book</h3>
-            <p>Add a photo, set price, go live fast.</p>
-        </div>
-
-        <div class="bb-step">
-            <h3>🔍 Browse</h3>
-            <p>Search books by title or author.</p>
-        </div>
-
-        <div class="bb-step">
-            <h3>🤝 Trade</h3>
-            <p>Connect and exchange books easily.</p>
-        </div>
-    </div>
-</div>
-
-<!-- CTA -->
-<div class="bb-section">
-    <div class="bb-cta">
-        <div>
-            <h2>Ready to clear your shelf?</h2>
-            <p>Join BookBridge today.</p>
-        </div>
-
-        <div sec:authorize="isAnonymous()">
-            <a href="/register" class="bb-btn-white">Create account</a>
-        </div>
-
-        <div sec:authorize="isAuthenticated()">
-            <a href="/dashboard" class="bb-btn-white">Dashboard</a>
-        </div>
+    <!-- Show when logged in -->
+    <div sec:authorize="isAuthenticated()">
+        <a href="/dashboard"
+           style="background:#48bb78;color:#fff;padding:14px 32px;
+                  border-radius:8px;text-decoration:none;font-size:16px;
+                  font-weight:600">
+            Go to Dashboard
+        </a>
     </div>
 </div>
 
