@@ -1,5 +1,6 @@
 package com.bookbridge.BookBridge.dto.response;
 
+import com.bookbridge.BookBridge.entity.enums.BookCondition;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +21,9 @@ public class BookResponse {
     private String imageUrl;
     private Double rating;
     private Integer totalPages;
+    private Double price;
+    private Boolean available;
+    private BookCondition condition;
     private String addedBy;
     private LocalDateTime createdAt;
 }

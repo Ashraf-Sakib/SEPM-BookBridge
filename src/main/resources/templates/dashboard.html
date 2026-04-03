@@ -28,7 +28,8 @@
             </div>
         </a>
 
-        <a href="/seller/books/new" style="text-decoration:none">
+        <a href="/seller/books/new" style="text-decoration:none"
+           sec:authorize="hasAnyRole('SELLER','ADMIN')">
             <div style="background:#fff;border-radius:10px;padding:24px;
                         border:1.5px solid #e2e8f0;cursor:pointer">
                 <div style="font-size:28px;margin-bottom:10px">➕</div>

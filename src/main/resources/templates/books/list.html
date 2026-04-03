@@ -12,6 +12,8 @@
         Discover second-hand books from the community.
     </p>
 
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
     <form method="get" action="/books"
           style="display:grid;grid-template-columns:2fr 2fr auto;gap:12px;margin-bottom:24px">
         <input type="text" name="title" placeholder="Search by title"

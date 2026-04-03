@@ -70,6 +70,9 @@ public class BookService {
         if (bookDetails.getImageUrl() != null) book.setImageUrl(bookDetails.getImageUrl());
         if (bookDetails.getRating() != null) book.setRating(bookDetails.getRating());
         if (bookDetails.getTotalPages() != null) book.setTotalPages(bookDetails.getTotalPages());
+        if (bookDetails.getPrice() != null) book.setPrice(bookDetails.getPrice());
+        if (bookDetails.getAvailable() != null) book.setAvailable(bookDetails.getAvailable());
+        if (bookDetails.getCondition() != null) book.setCondition(bookDetails.getCondition());
 
         Book updatedBook = bookRepository.save(book);
         return convertToResponse(updatedBook);
@@ -95,6 +98,9 @@ public class BookService {
         response.setImageUrl(book.getImageUrl());
         response.setRating(book.getRating());
         response.setTotalPages(book.getTotalPages());
+        response.setPrice(book.getPrice());
+        response.setAvailable(book.getAvailable());
+        response.setCondition(book.getCondition());
         response.setAddedBy(book.getAddedBy().getUsername());
         response.setCreatedAt(book.getCreatedAt());
         return response;
