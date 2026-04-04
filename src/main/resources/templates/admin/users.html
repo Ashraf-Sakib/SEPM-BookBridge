@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin Users')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h2 style="margin-bottom:8px;color:#1a202c">User Management</h2>
+    <p style="color:#64748b;margin-bottom:20px">
+        Manage buyer/seller access. Admin accounts stay protected. Disable first, then delete after <strong th:text="${deletionGraceDays}">14</strong> days.
+    </p>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <form method="get" th:action="@{/admin/users}" class="surface-card"
+          style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:14px;margin-bottom:18px">
+        <div>
+            <label for="role" style="display:block;font-size:12px;color:#4a5568;margin-bottom:4px">Role filter</label>
+            <select id="role" name="role" class="soft-input">
+                <option value="ALL" th:selected="${selectedRole == 'ALL'}">All</option>
+                <option value="BUYER" th:selected="${selectedRole == 'BUYER'}">Buyer only</option>
+                <option value="SELLER" th:selected="${selectedRole == 'SELLER'}">Seller only</option>
+                <option value="MIXED" th:selected="${selectedRole == 'MIXED'}">Buyer + Seller</option>
+                <option value="ADMIN" th:selected="${selectedRole == 'ADMIN'}">Admin</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="status" style="display:block;font-size:12px;color:#4a5568;margin-bottom:4px">Status filter</label>
+            <select id="status" name="status" class="soft-input">
+                <option value="ALL" th:selected="${selectedStatus == 'ALL'}">All</option>
+                <option value="ACTIVE" th:selected="${selectedStatus == 'ACTIVE'}">Active</option>
+                <option value="DISABLED" th:selected="${selectedStatus == 'DISABLED'}">Disabled</option>
+                <option value="PENDING_DELETE" th:selected="${selectedStatus == 'PENDING_DELETE'}">Pending delete</option>
+            </select>
+        </div>
+
+        <div style="display:flex;align-items:flex-end">
+            <button type="submit" class="btn btn-primary" style="max-width:180px">Apply Filters</button>
+        </div>
+    </form>
+
+    <div th:if="${#lists.isEmpty(users)}" class="surface-card" style="padding:16px;color:#64748b">
+        No users match your filters.
+    </div>
+
+    <div th:if="${!#lists.isEmpty(users)}" style="display:grid;gap:14px">
+        <article th:each="user : ${users}" class="surface-card" style="padding:16px">
+            <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+                <div>
+                    <div style="font-weight:700;color:#0f172a" th:text="${user.username}">username</div>
+                    <div style="font-size:13px;color:#64748b" th:text="${user.email}">email</div>
+                </div>
+                <div style="font-size:12px;color:#475569">
+                    <span th:if="${user.deletionScheduledAt != null}">
+                        Scheduled delete: <strong th:text="${#temporals.format(user.deletionScheduledAt, 'yyyy-MM-dd HH:mm')}">date</strong>
+                    </span>
+                    <span th:if="${user.deletionScheduledAt == null}">
+                        Status: <strong th:text="${user.enabled ? 'Active' : 'Disabled'}">Active</strong>
+                    </span>
+                </div>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+                <span class="chip" th:each="r : ${user.roles}" th:text="${r}">ROLE_BUYER</span>
+            </div>
+
+            <div th:if="${user.roles != null and #sets.contains(user.roles, 'ROLE_ADMIN')}"
+                 style="font-size:13px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;padding:10px;border-radius:8px">
+                Protected admin account. Role and lifecycle actions are disabled.
+            </div>
+
+            <div th:if="${user.roles == null or !#sets.contains(user.roles, 'ROLE_ADMIN')}" style="display:grid;gap:10px">
+                <form th:action="@{/admin/users/{id}/roles(id=${user.id})}" method="post"
+                      style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <label style="display:inline-flex;gap:6px;align-items:center;font-size:13px;color:#334155">
+                        <input type="checkbox" name="roles" value="ROLE_BUYER"
+                               th:checked="${user.roles != null and #sets.contains(user.roles, 'ROLE_BUYER')}" />
+                        Buyer
+                    </label>
+                    <label style="display:inline-flex;gap:6px;align-items:center;font-size:13px;color:#334155">
+                        <input type="checkbox" name="roles" value="ROLE_SELLER"
+                               th:checked="${user.roles != null and #sets.contains(user.roles, 'ROLE_SELLER')}" />
+                        Seller
+                    </label>
+                    <button type="submit" style="padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;cursor:pointer">
+                        Update Roles
+                    </button>
+                </form>
+
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                    <form th:if="${user.enabled}" th:action="@{/admin/users/{id}/disable(id=${user.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" style="padding:8px 12px;border-radius:8px;border:1px solid #fecaca;background:#fff1f2;color:#9f1239;cursor:pointer">
+                            Disable
+                        </button>
+                    </form>
+
+                    <form th:if="${!user.enabled}" th:action="@{/admin/users/{id}/enable(id=${user.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" style="padding:8px 12px;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;cursor:pointer">
+                            Enable
+                        </button>
+                    </form>
+
+                    <form th:if="${user.deletionScheduledAt == null}" th:action="@{/admin/users/{id}/schedule-delete(id=${user.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" style="padding:8px 12px;border-radius:8px;border:1px solid #fcd34d;background:#fffbeb;color:#92400e;cursor:pointer">
+                            Schedule Delete (14 days)
+                        </button>
+                    </form>
+
+                    <form th:if="${user.deletionScheduledAt != null}" th:action="@{/admin/users/{id}/cancel-delete(id=${user.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" style="padding:8px 12px;border-radius:8px;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;cursor:pointer">
+                            Cancel Scheduled Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+</body>
+</html>
+
