@@ -27,7 +27,7 @@ spring:
       max-request-size: 10MB
 
 server:
-  port: 8082
+  port: ${PORT:8082}
 
 bookbridge:
   upload-dir: ${BOOKBRIDGE_UPLOAD_DIR:uploads}
