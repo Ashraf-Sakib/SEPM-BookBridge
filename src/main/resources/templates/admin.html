@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Admin')}"></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin')}">
+    <title>Admin Panel</title>
+</head>
 <body>
 
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
@@ -14,8 +16,56 @@
         Admin Panel
     </h2>
     <p style="color:#718096;margin-bottom:24px">
-        Manage users and listings from here.
+        Manage marketplace users, listings, and system pages from one place.
     </p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px">
+        <a th:href="@{/admin/users}" style="text-decoration:none">
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:20px;border:1.5px solid #e2e8f0;cursor:pointer">
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">Manage Users</div>
+                <div style="font-size:13px;color:#718096">Assign buyer/seller roles and control account status</div>
+            </div>
+        </a>
+
+        <a th:href="@{/dashboard}" style="text-decoration:none">
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:20px;border:1.5px solid #e2e8f0;cursor:pointer">
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">Dashboard</div>
+                <div style="font-size:13px;color:#718096">Return to the main control panel</div>
+            </div>
+        </a>
+
+        <a th:href="@{/books}" style="text-decoration:none">
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:20px;border:1.5px solid #e2e8f0;cursor:pointer">
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">Browse Books</div>
+                <div style="font-size:13px;color:#718096">Review the live book catalog</div>
+            </div>
+        </a>
+
+        <a th:href="@{/seller/books/new}" style="text-decoration:none">
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:20px;border:1.5px solid #e2e8f0;cursor:pointer">
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">Add / Sell Book</div>
+                <div style="font-size:13px;color:#718096">Open the listing form</div>
+            </div>
+        </a>
+
+        <a th:href="@{/orders}" style="text-decoration:none">
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:20px;border:1.5px solid #e2e8f0;cursor:pointer">
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">Orders</div>
+                <div style="font-size:13px;color:#718096">Check purchases and sales</div>
+            </div>
+        </a>
+    </div>
+
+    <div style="background:#fff;border:1.5px solid #dbeafe;border-radius:14px;padding:20px;color:#334155;margin-bottom:20px">
+        <div style="font-weight:600;color:#1e3a8a;margin-bottom:8px">Seeded admin accounts</div>
+        <ul style="margin:0;padding-left:18px;line-height:1.8">
+            <li><strong>Abir-49</strong> / <code>000000</code></li>
+            <li><strong>Ashraful-36</strong> / <code>000000</code></li>
+        </ul>
+        <div style="font-size:13px;color:#64748b;margin-top:10px">
+            Admin accounts are protected and are not available via public registration.
+        </div>
+    </div>
 
     <div style="background:#fff;border:1.5px solid #fbcfe8;border-radius:14px;padding:28px;color:#4a5568;display:flex;align-items:center;gap:12px">
         <span style="width:40px;height:40px;border-radius:10px;background:#fef2f2;color:#b91c1c;display:grid;place-items:center;flex:0 0 auto">
@@ -24,7 +74,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5h.008v.008H12z"/>
             </svg>
         </span>
-        <div>Admin tools are available in upcoming updates.</div>
+        <div>
+            Account removal policy: disable first, then schedule deletion. Accounts are purged automatically after 14 days unless deletion is canceled.
+        </div>
     </div>
 </div>
 
