@@ -6,37 +6,146 @@
 
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
+<style>
+    @media (max-width: 760px) {
+        .books-search-form {
+            grid-template-columns: 1fr !important;
+        }
+
+        .books-search-form input,
+        .books-search-form button {
+            margin: 0 !important;
+        }
+
+        .books-pagination {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+
 <div class="container">
-    <h2 style="margin-bottom:8px;color:#1a202c">Browse Books</h2>
+    <h2 style="margin-bottom:8px;color:#1a202c;display:flex;align-items:center;gap:10px">
+        <svg class="hi hi-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 6.75A2.25 2.25 0 016.75 4.5h9A2.25 2.25 0 0118 6.75v12A2.25 2.25 0 0115.75 21h-9A2.25 2.25 0 014.5 18.75v-12z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25h6M9 11.25h6M9 14.25h4.5"/>
+        </svg>
+        Browse Books
+    </h2>
     <p style="color:#718096;margin-bottom:24px">
         Discover second-hand books from the community.
     </p>
 
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <span class="chip">
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 6.75A2.25 2.25 0 016.75 4.5h9A2.25 2.25 0 0118 6.75v12A2.25 2.25 0 0115.75 21h-9A2.25 2.25 0 014.5 18.75v-12z"/>
+            </svg>
+            <span th:text="${totalElements} + ' books found'">0 books found</span>
+        </span>
+        <span class="chip" th:if="${hasFilters}">
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M6.75 12h10.5M10.5 19.5h3"/>
+            </svg>
+            Filters active
+        </span>
+    </div>
 
-    <form method="get" action="/books"
-          style="display:grid;grid-template-columns:2fr 2fr auto;gap:12px;margin-bottom:24px">
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <section th:if="${currentUsername != null}" style="margin-bottom:28px">
+        <h3 style="margin-bottom:10px;color:#1a202c">Books Added by You</h3>
+        <div th:if="${#lists.isEmpty(myBooks)}"
+             style="background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:16px;color:#4a5568">
+            You have not added any books yet.
+        </div>
+
+        <div th:if="${!#lists.isEmpty(myBooks)}"
+             style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+            <article th:each="book : ${myBooks}"
+                     style="background:#f8fafc;border-radius:10px;border:1.5px solid #dbeafe;padding:14px;display:flex;flex-direction:column;gap:8px">
+                <img th:if="${book.imageUrl != null and !#strings.isEmpty(book.imageUrl)}"
+                     th:src="${book.imageUrl}"
+                     alt="Book cover"
+                     style="width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0"/>
+                <div th:if="${book.imageUrl == null or #strings.isEmpty(book.imageUrl)}"
+                     style="width:100%;height:150px;border-radius:8px;border:1px solid #e2e8f0;background:linear-gradient(145deg,#e2e8f0,#f8fafc);display:grid;place-items:center;color:#64748b;font-size:13px">
+                    No image provided
+                </div>
+                <h4 th:text="${book.title}" style="font-size:16px;color:#1a202c;margin:0">Book title</h4>
+                <p style="font-size:13px;color:#4a5568;margin:0">
+                    By <span th:text="${book.author ?: 'Unknown author'}">Author</span>
+                </p>
+                <p style="font-size:13px;color:#4a5568;margin:0">
+                    Status:
+                    <strong th:text="${book.available != null and book.available ? 'Available' : 'Sold'}">Available</strong>
+                </p>
+                <p style="font-size:13px;color:#4a5568;margin:0" th:if="${book.price != null}">
+                    Price:
+                    <span th:if="${book.discountedPrice != null}">
+                        <span style="text-decoration:line-through;color:#94a3b8" th:text="${'৳' + book.price}">৳0.00</span>
+                        <strong style="color:#166534;margin-left:6px" th:text="${'৳' + book.discountedPrice}">৳0.00</strong>
+                        <span style="margin-left:6px;color:#166534;font-weight:600" th:text="${book.discountPercentage + '% off'}">0% off</span>
+                    </span>
+                    <strong th:if="${book.discountedPrice == null}" th:text="${'৳' + book.price}">৳0.00</strong>
+                </p>
+                <p style="font-size:13px;color:#4a5568;margin:0" th:if="${book.discountPercentage != null}">
+                    Discount:
+                    <strong th:text="${book.discountPercentage + '%'}">0%</strong>
+                </p>
+                <a th:href="@{/seller/books/{id}/edit(id=${book.id})}"
+                   style="margin-top:4px;text-decoration:none;width:100%;background:#1d4ed8;color:#fff;border-radius:8px;padding:10px 12px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px">
+                    <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 112.652 2.652L7.554 19.097a4.5 4.5 0 01-1.897 1.13l-2.685.795.795-2.685a4.5 4.5 0 011.13-1.897l11.965-11.963z"/>
+                    </svg>
+                    Edit details
+                </a>
+            </article>
+        </div>
+    </section>
+
+            <form method="get" action="/books"
+                class="books-search-form surface-card"
+                style="display:grid;grid-template-columns:2fr 2fr auto;gap:12px;margin-bottom:24px">
         <input type="text" name="title" placeholder="Search by title"
                th:value="${title}"
-               style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px"/>
+             class="soft-input" style="margin:12px 0 12px 12px"/>
         <input type="text" name="author" placeholder="Search by author"
                th:value="${author}"
-               style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px"/>
+             class="soft-input" style="margin:12px 0"/>
         <button type="submit"
-                style="background:#48bb78;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer">
+              style="background:#48bb78;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin:12px 12px 12px 0;justify-content:center">
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <circle cx="11" cy="11" r="6"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-4.2-4.2"/>
+            </svg>
             Search
         </button>
     </form>
 
     <div th:if="${#lists.isEmpty(books)}"
-         style="background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:24px;color:#4a5568">
+         style="background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:24px;color:#4a5568;display:flex;align-items:center;gap:10px">
+        <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="11" cy="11" r="6"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-4.2-4.2"/>
+        </svg>
         No books found for your search.
     </div>
 
     <div th:if="${!#lists.isEmpty(books)}"
          style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">
         <article th:each="book : ${books}"
-                 style="background:#fff;border-radius:10px;border:1.5px solid #e2e8f0;padding:16px;display:flex;flex-direction:column;gap:10px">
+                  class="interactive-card"
+                  style="background:#fff;border-radius:10px;border:1.5px solid #e2e8f0;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <img th:if="${book.imageUrl != null and !#strings.isEmpty(book.imageUrl)}"
+                 th:src="${book.imageUrl}"
+                 alt="Book cover"
+                 style="width:100%;height:180px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0"/>
+              <div th:if="${book.imageUrl == null or #strings.isEmpty(book.imageUrl)}"
+                  style="width:100%;height:180px;border-radius:8px;border:1px solid #e2e8f0;background:linear-gradient(145deg,#e2e8f0,#f8fafc);display:grid;place-items:center;color:#64748b;font-size:13px">
+                 No image provided
+              </div>
             <h3 th:text="${book.title}" style="font-size:18px;color:#1a202c">Book title</h3>
             <p style="font-size:14px;color:#4a5568">
                 By <span th:text="${book.author ?: 'Unknown author'}">Author</span>
@@ -46,14 +155,68 @@
             <p style="font-size:13px;color:#4a5568">
                 Added by <strong th:text="${book.addedBy}">user</strong>
             </p>
+            <p style="font-size:13px;color:#4a5568" th:if="${book.price != null}">
+                Price:
+                <span th:if="${book.discountedPrice != null}">
+                    <span style="text-decoration:line-through;color:#94a3b8" th:text="${'৳' + book.price}">৳0.00</span>
+                    <strong style="color:#166534;margin-left:6px" th:text="${'৳' + book.discountedPrice}">৳0.00</strong>
+                    <span style="margin-left:6px;color:#166534;font-weight:600" th:text="${book.discountPercentage + '% off'}">0% off</span>
+                </span>
+                <strong th:if="${book.discountedPrice == null}" th:text="${'৳' + book.price}">৳0.00</strong>
+            </p>
+            <p style="font-size:13px;color:#4a5568" th:if="${book.discountPercentage != null}">
+                Discount: <strong th:text="${book.discountPercentage + '%'}">0%</strong>
+            </p>
+            <p style="font-size:13px;color:#4a5568"
+               th:if="${!(currentUsername != null and currentUsername != book.addedBy and book.available != null and book.available)}">
+                Availability:
+                <strong th:text="${book.available != null and book.available ? 'Available' : 'Sold'}">Available</strong>
+            </p>
+            <form th:if="${currentUsername != null and currentUsername != book.addedBy and book.available != null and book.available}"
+                  th:action="@{/chat/start}"
+                  method="post"
+                  style="margin-top:0">
+                <input type="hidden" name="bookId" th:value="${book.id}"/>
+                <button type="submit"
+                        style="background:#ecfdf5;color:#166534;border:1px solid #86efac;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+                    <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                    </svg>
+                    Availability: Available (click to message)
+                </button>
+            </form>
+            <a th:if="${currentUsername != null and currentUsername == book.addedBy}"
+               th:href="@{/seller/books/{id}/edit(id=${book.id})}"
+               style="margin-top:4px;text-decoration:none;width:100%;background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 12px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px">
+                <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 112.652 2.652L7.554 19.097a4.5 4.5 0 01-1.897 1.13l-2.685.795.795-2.685a4.5 4.5 0 011.13-1.897l11.965-11.963z"/>
+                </svg>
+                Edit details
+            </a>
+            <form th:if="${currentUsername != null and currentUsername != book.addedBy}"
+                  th:action="@{/chat/start}"
+                  method="post"
+                  style="margin-top:4px">
+                <input type="hidden" name="bookId" th:value="${book.id}"/>
+                <button type="submit"
+                        style="width:100%;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px">
+                    <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 100-.75.375.375 0 000 .75zm0 0H6.375A2.25 2.25 0 004.125 12v1.5A2.25 2.25 0 006.375 15.75h1.5v2.25l2.25-2.25h5.25A2.25 2.25 0 0017.625 13.5V12a2.25 2.25 0 00-2.25-2.25H8.625z"/>
+                    </svg>
+                    Message Seller
+                </button>
+            </form>
         </article>
     </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px"
+    <div class="books-pagination" style="display:flex;justify-content:space-between;align-items:center;margin-top:24px"
          th:if="${totalPages > 0}">
         <a th:if="${!first}"
            th:href="@{/books(page=${pageNumber - 1},size=${size},title=${title},author=${author})}"
-           style="text-decoration:none;color:#2d3748;border:1px solid #cbd5e0;padding:8px 12px;border-radius:8px">
+           style="text-decoration:none;color:#2d3748;border:1px solid #cbd5e0;padding:8px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:8px">
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+            </svg>
             Previous
         </a>
         <span th:if="${first}"></span>
@@ -63,8 +226,11 @@
 
         <a th:if="${!last}"
            th:href="@{/books(page=${pageNumber + 1},size=${size},title=${title},author=${author})}"
-           style="text-decoration:none;color:#2d3748;border:1px solid #cbd5e0;padding:8px 12px;border-radius:8px">
+           style="text-decoration:none;color:#2d3748;border:1px solid #cbd5e0;padding:8px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:8px">
             Next
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/>
+            </svg>
         </a>
         <span th:if="${last}"></span>
     </div>

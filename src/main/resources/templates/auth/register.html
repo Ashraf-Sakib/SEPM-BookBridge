@@ -5,61 +5,140 @@
 
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<div class="auth-card">
-    <h2>Create account</h2>
-    <p class="subtitle">Join BookBridge — buy and sell second-hand books</p>
+<style>
+    .auth-card {
+        animation: riseIn .45s ease;
+    }
 
-    <div class="alert alert-error"
-         th:if="${errorMessage}"
-         th:text="${errorMessage}">
-    </div>
+    .register-helper {
+        margin: -8px 0 16px;
+        font-size: 12px;
+        color: #64748b;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-    <form th:action="@{/register}"
-          th:object="${registerRequest}"
-          method="post">
+    .form-tip {
+        margin-top: 6px;
+        font-size: 12px;
+        color: #64748b;
+    }
 
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text"
-                   id="username"
-                   th:field="*{username}"
-                   placeholder="Choose a username"
-                   autofocus/>
-            <div class="field-error"
-                 th:if="${#fields.hasErrors('username')}"
-                 th:errors="*{username}">
+    @keyframes riseIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="auth-shell">
+    <div class="auth-split-card">
+        <section class="auth-visual"
+                 style="background-image:url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1400&q=80');">
+            <div class="auth-visual-content">
+                <h1 class="auth-visual-title">Start your book exchange journey</h1>
+                <p class="auth-visual-subtitle">Create an account to list books, discover affordable reads, and connect with the community.</p>
+                <div class="auth-visual-points">
+                    <span class="auth-visual-point">
+                        <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.276c.066.39.306.73.645.916a7.03 7.03 0 011.6 1.134c.27.27.654.39 1.028.324l1.265-.223a1.125 1.125 0 011.227.603l1.296 2.247c.275.476.173 1.082-.245 1.443l-1.082.936a1.125 1.125 0 00-.362 1.074c.072.417.108.846.108 1.285 0 .439-.036.868-.108 1.285a1.125 1.125 0 00.362 1.074l1.082.936c.418.361.52.967.245 1.443l-1.296 2.247a1.125 1.125 0 01-1.227.603l-1.265-.223a1.125 1.125 0 00-1.028.324 7.03 7.03 0 01-1.6 1.134c-.34.186-.58.526-.645.916l-.213 1.276a1.125 1.125 0 01-1.11.94h-2.593a1.125 1.125 0 01-1.11-.94l-.213-1.276a1.125 1.125 0 00-.645-.916 7.03 7.03 0 01-1.6-1.134 1.125 1.125 0 00-1.028-.324l-1.265.223a1.125 1.125 0 01-1.227-.603L2.39 18.11a1.125 1.125 0 01.245-1.443l1.082-.936c.324-.28.476-.704.362-1.074a7.863 7.863 0 01-.108-1.285c0-.439.036-.868.108-1.285a1.125 1.125 0 00-.362-1.074l-1.082-.936a1.125 1.125 0 01-.245-1.443L3.686 5.887a1.125 1.125 0 011.227-.603l1.265.223c.374.066.758-.054 1.028-.324a7.03 7.03 0 011.6-1.134c.34-.186.58-.526.645-.916l.213-1.276z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l2.25 2.25L15 9.75"/>
+                        </svg>
+                        Profile setup in minutes
+                    </span>
+                    <span class="auth-visual-point">
+                        <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
+                        </svg>
+                        Start listing instantly
+                    </span>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email"
-                   id="email"
-                   th:field="*{email}"
-                   placeholder="Enter your email"/>
-            <div class="field-error"
-                 th:if="${#fields.hasErrors('email')}"
-                 th:errors="*{email}">
+        <section class="auth-form-panel">
+            <div class="auth-card">
+                <h2>Create account</h2>
+                <p class="subtitle">Join BookBridge and start trading second-hand books.</p>
+                <p class="register-helper">
+                    <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l2.25 2.25L15 9.75"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 5.25h15A2.25 2.25 0 0121.75 7.5v9A2.25 2.25 0 0119.5 18.75h-15A2.25 2.25 0 012.25 16.5v-9A2.25 2.25 0 014.5 5.25z"/>
+                    </svg>
+                    Choose whether this account starts as a buyer or seller profile.
+                </p>
+
+                <div class="alert alert-error"
+                     th:if="${errorMessage}"
+                     th:text="${errorMessage}">
+                </div>
+
+                <form th:action="@{/register}"
+                      th:object="${registerRequest}"
+                      method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text"
+                               id="username"
+                               th:field="*{username}"
+                               placeholder="Choose a username"
+                               autofocus/>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('username')}"
+                             th:errors="*{username}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email"
+                               id="email"
+                               th:field="*{email}"
+                               placeholder="Enter your email"/>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('email')}"
+                             th:errors="*{email}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password"
+                               id="password"
+                               th:field="*{password}"
+                               placeholder="At least 6 characters"/>
+                        <div class="form-tip">Use a password you do not reuse on other websites.</div>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('password')}"
+                             th:errors="*{password}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Account Type</label>
+                        <select id="role" th:field="*{role}">
+                            <option th:value="${T(com.bookbridge.BookBridge.entity.Role$RoleName).ROLE_BUYER}">Buyer</option>
+                            <option th:value="${T(com.bookbridge.BookBridge.entity.Role$RoleName).ROLE_SELLER}">Seller</option>
+                        </select>
+                        <div class="form-tip">Admins are created separately and cannot self-register.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                </form>
+
+                <div class="auth-link">
+                    Already have an account? <a href="/login">Sign in</a>
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password"
-                   id="password"
-                   th:field="*{password}"
-                   placeholder="At least 6 characters"/>
-            <div class="field-error"
-                 th:if="${#fields.hasErrors('password')}"
-                 th:errors="*{password}">
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Create Account</button>
-    </form>
-
-    <div class="auth-link">
-        Already have an account? <a href="/login">Sign in</a>
+        </section>
     </div>
 </div>
 

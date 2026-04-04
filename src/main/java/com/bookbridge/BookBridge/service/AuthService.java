@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Locale;
 import java.util.Set;
 
 @Service
@@ -33,35 +32,28 @@ public class AuthService {
             throw new IllegalArgumentException(
                     "Email already registered");
 
-        Role.RoleName roleName = mapRole(request.getRole());
+        Role.RoleName requestedRole = request.getRole() == null
+                ? Role.RoleName.ROLE_BUYER
+                : request.getRole();
 
-        Role userRole = roleRepository
-            .findByName(roleName)
+        if (requestedRole == Role.RoleName.ROLE_ADMIN) {
+            throw new IllegalArgumentException(
+                    "Admin accounts cannot be registered");
+        }
+
+        Role assignedRole = roleRepository
+            .findByName(requestedRole)
             .orElseThrow(() -> new ResourceNotFoundException(
-                "Role not found: " + roleName));
+                "Role not found: " + requestedRole));
 
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .enabled(true)
-                .roles(Set.of(userRole))
+                .roles(Set.of(assignedRole))
                 .build();
 
         return userRepository.save(user);
-    }
-
-    private Role.RoleName mapRole(String role) {
-        if (role == null || role.isBlank()) {
-            return Role.RoleName.ROLE_BUYER;
-        }
-
-        String normalized = role.trim().toUpperCase(Locale.ROOT);
-        return switch (normalized) {
-            case "BUYER", "ROLE_BUYER" -> Role.RoleName.ROLE_BUYER;
-            case "SELLER", "ROLE_SELLER" -> Role.RoleName.ROLE_SELLER;
-            case "ADMIN", "ROLE_ADMIN" -> Role.RoleName.ROLE_ADMIN;
-            default -> throw new IllegalArgumentException("Unsupported role: " + role);
-        };
     }
 }

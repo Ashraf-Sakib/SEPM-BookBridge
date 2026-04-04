@@ -17,10 +17,15 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
 
         <a href="/books" style="text-decoration:none">
-            <div style="background:#fff;border-radius:10px;padding:24px;
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:24px;
                         border:1.5px solid #e2e8f0;cursor:pointer;
                         transition:box-shadow .2s">
-                <div style="font-size:28px;margin-bottom:10px">📚</div>
+                <div style="width:44px;height:44px;border-radius:10px;background:#f0fdf4;color:#166534;display:grid;place-items:center;margin-bottom:10px">
+                    <svg class="hi hi-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 6.75A2.25 2.25 0 016.75 4.5h9A2.25 2.25 0 0118 6.75v12A2.25 2.25 0 0115.75 21h-9A2.25 2.25 0 014.5 18.75v-12z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25h6M9 11.25h6M9 14.25h4.5"/>
+                    </svg>
+                </div>
                 <div style="font-weight:600;color:#1a202c;margin-bottom:4px">
                     Browse Books</div>
                 <div style="font-size:13px;color:#718096">
@@ -28,22 +33,32 @@
             </div>
         </a>
 
-        <a href="/seller/books/new" style="text-decoration:none"
-           sec:authorize="hasAnyRole('SELLER','ADMIN')">
-            <div style="background:#fff;border-radius:10px;padding:24px;
+          <a href="/seller/books/new" style="text-decoration:none"
+              sec:authorize="isAuthenticated()">
+                        <div class="interactive-card" style="background:#fff;border-radius:10px;padding:24px;
                         border:1.5px solid #e2e8f0;cursor:pointer">
-                <div style="font-size:28px;margin-bottom:10px">➕</div>
+                <div style="width:44px;height:44px;border-radius:10px;background:#eff6ff;color:#1d4ed8;display:grid;place-items:center;margin-bottom:10px">
+                    <svg class="hi hi-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                    </svg>
+                </div>
                 <div style="font-weight:600;color:#1a202c;margin-bottom:4px">
-                    List a Book</div>
+                    Add / Sell Book</div>
                 <div style="font-size:13px;color:#718096">
                     Sell your old books</div>
             </div>
         </a>
 
         <a href="/orders" style="text-decoration:none">
-            <div style="background:#fff;border-radius:10px;padding:24px;
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:24px;
                         border:1.5px solid #e2e8f0;cursor:pointer">
-                <div style="font-size:28px;margin-bottom:10px">🛒</div>
+                <div style="width:44px;height:44px;border-radius:10px;background:#fff7ed;color:#c2410c;display:grid;place-items:center;margin-bottom:10px">
+                    <svg class="hi hi-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3.75h1.5l1.636 7.864a2.25 2.25 0 002.205 1.786h8.77a2.25 2.25 0 002.205-1.786L20.25 6.75H6.172"/>
+                        <circle cx="9" cy="18.75" r="1.5"/>
+                        <circle cx="17.25" cy="18.75" r="1.5"/>
+                    </svg>
+                </div>
                 <div style="font-weight:600;color:#1a202c;margin-bottom:4px">
                     My Orders</div>
                 <div style="font-size:13px;color:#718096">
@@ -54,9 +69,14 @@
         <!-- Only visible to ADMIN -->
         <a href="/admin" sec:authorize="hasRole('ADMIN')"
            style="text-decoration:none">
-            <div style="background:#fff;border-radius:10px;padding:24px;
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:24px;
                         border:1.5px solid #fed7d7;cursor:pointer">
-                <div style="font-size:28px;margin-bottom:10px">⚙️</div>
+                <div style="width:44px;height:44px;border-radius:10px;background:#fef2f2;color:#b91c1c;display:grid;place-items:center;margin-bottom:10px">
+                    <svg class="hi hi-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h3m-6.87 1.907l2.122 1.224m8.496 4.905l2.122 1.224m-12.74 0l2.122-1.224m8.496-4.905l2.122-1.224M12 3v2.25m0 13.5V21m-6.364-3.864l1.59-1.59m10.548-7.094l1.59-1.59M3 12h2.25m13.5 0H21m-3.226 5.136l-1.59-1.59M7.226 8.452l-1.59-1.59"/>
+                        <circle cx="12" cy="12" r="2.5"/>
+                    </svg>
+                </div>
                 <div style="font-weight:600;color:#1a202c;margin-bottom:4px">
                     Admin Panel</div>
                 <div style="font-size:13px;color:#718096">
@@ -64,6 +84,19 @@
             </div>
         </a>
 
+    </div>
+
+    <div class="surface-card" style="margin-top:20px;padding:16px 18px;display:flex;gap:10px;align-items:flex-start;color:#475569">
+        <span style="width:30px;height:30px;border-radius:8px;background:#ecfeff;color:#0f766e;display:grid;place-items:center;flex:0 0 auto">
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 9.75h1.5v4.5h-1.5zM12 6.75h.008v.008H12z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </span>
+        <div>
+            <strong style="color:#1e293b">Quick tip:</strong>
+            Listings with a clear cover image and condition details usually sell faster.
+        </div>
     </div>
 </div>
 
