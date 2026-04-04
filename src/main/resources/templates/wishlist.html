@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My Wishlist')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h2 style="margin-bottom:8px;color:#1a202c;display:flex;align-items:center;gap:10px">My Wishlist</h2>
+    <p style="color:#718096;margin-bottom:24px">Books you saved to review later.</p>
+
+    <div th:if="${#lists.isEmpty(wishlistItems)}"
+         style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:22px;color:#4a5568">
+        Your wishlist is empty.
+    </div>
+
+    <div th:if="${!#lists.isEmpty(wishlistItems)}"
+         style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px">
+        <article th:each="item : ${wishlistItems}"
+                 style="background:#fff;border-radius:12px;border:1.5px solid #e2e8f0;padding:14px;display:flex;flex-direction:column;gap:8px">
+            <img th:if="${item.imageUrl != null and !#strings.isEmpty(item.imageUrl)}"
+                 th:src="${item.imageUrl}"
+                 onerror="this.onerror=null;this.src='/images/book-placeholder.svg';"
+                 alt="Book cover"
+                 style="width:100%;height:170px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0"/>
+            <div th:if="${item.imageUrl == null or #strings.isEmpty(item.imageUrl)}"
+                 style="width:100%;height:170px;border-radius:8px;border:1px solid #e2e8f0;background:linear-gradient(145deg,#e2e8f0,#f8fafc);display:grid;place-items:center;color:#64748b;font-size:13px">
+                No image provided
+            </div>
+            <h3 th:text="${item.title}" style="font-size:16px;color:#1a202c">Title</h3>
+            <p style="font-size:13px;color:#4a5568">By <span th:text="${item.author ?: 'Unknown author'}">Author</span></p>
+            <p style="font-size:13px;color:#4a5568" th:if="${item.price != null}">Price: <strong th:text="${'৳' + item.price}">৳0.00</strong></p>
+            <a th:href="@{/books}" style="margin-top:4px;text-decoration:none;width:100%;background:#2563eb;color:#fff;border-radius:8px;padding:10px 12px;font-weight:600;display:inline-flex;align-items:center;justify-content:center">
+                Browse & Chat
+            </a>
+        </article>
+    </div>
+</div>
+
+</body>
+</html>
+

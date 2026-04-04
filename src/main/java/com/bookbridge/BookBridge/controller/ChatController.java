@@ -1,5 +1,6 @@
 package com.bookbridge.BookBridge.controller;
 
+import com.bookbridge.BookBridge.dto.request.SellBookRequest;
 import com.bookbridge.BookBridge.dto.response.ChatThreadView;
 import com.bookbridge.BookBridge.dto.response.UserResponse;
 import com.bookbridge.BookBridge.entity.Book;
@@ -8,6 +9,7 @@ import com.bookbridge.BookBridge.entity.Message;
 import com.bookbridge.BookBridge.service.BookService;
 import com.bookbridge.BookBridge.service.ConversationService;
 import com.bookbridge.BookBridge.service.MessageService;
+import com.bookbridge.BookBridge.service.TransactionService;
 import com.bookbridge.BookBridge.service.UserService;
 import java.security.Principal;
 import java.util.LinkedHashMap;
@@ -33,6 +35,7 @@ public class ChatController {
     private final MessageService messageService;
     private final UserService userService;
     private final BookService bookService;
+    private final TransactionService transactionService;
 
     @GetMapping({"/chat", "/chat/{conversationId}"})
     public String showChat(
@@ -77,6 +80,10 @@ public class ChatController {
                 ? "Messages"
                 : "Chat with " + resolveParticipantName(activeConversation, currentUser.getId()));
         model.addAttribute("conversations", conversations);
+        model.addAttribute("canConfirmSale", activeConversation != null
+                && activeConversation.getBook().getAddedBy().getId().equals(currentUser.getId())
+                && activeConversation.getBook().getAvailable() != null
+                && activeConversation.getBook().getAvailable());
 
         return "chat";
     }
@@ -116,6 +123,11 @@ public class ChatController {
             return "redirect:/books";
         }
 
+        if (book.getAvailable() == null || !book.getAvailable()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "This book is no longer available.");
+            return "redirect:/books";
+        }
+
         Conversation conversation = conversationService.findOrCreateConversation(
                 bookId,
                 currentUser.getId(),
@@ -123,6 +135,37 @@ public class ChatController {
 
         redirectAttributes.addFlashAttribute("successMessage", "Conversation opened.");
         return "redirect:/chat/" + conversation.getId();
+    }
+
+    @PostMapping("/chat/{conversationId}/confirm-sale")
+    public String confirmSale(
+            @PathVariable Integer conversationId,
+            @RequestParam(required = false) Double salePrice,
+            @RequestParam(required = false) String notes,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
+
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        UserResponse currentUser = userService.getUserByUsername(principal.getName());
+        Conversation conversation = conversationService.getConversationById(conversationId);
+        Book book = conversation.getBook();
+
+        if (!book.getAddedBy().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Only the seller can confirm this sale");
+        }
+
+        SellBookRequest request = new SellBookRequest();
+        request.setBookId(book.getId());
+        request.setBuyerId(conversation.getUser().getId());
+        request.setSalePrice(resolveSalePrice(salePrice, book));
+        request.setNotes(notes);
+
+        transactionService.sellBook(currentUser.getId(), request);
+        redirectAttributes.addFlashAttribute("successMessage", "Sale confirmed and order created.");
+        return "redirect:/orders";
     }
 
     private List<ChatThreadView> buildConversationThreads(List<Conversation> conversations, Integer currentUserId) {
@@ -169,5 +212,18 @@ public class ChatController {
 
     private String resolvePreviewText(Conversation conversation) {
         return conversation.getResponse() != null ? conversation.getResponse() : conversation.getMessage();
+    }
+
+    private Double resolveSalePrice(Double salePrice, Book book) {
+        if (salePrice != null && salePrice >= 0) {
+            return salePrice;
+        }
+
+        Double listedPrice = book.getPrice();
+        if (listedPrice != null && listedPrice >= 0) {
+            return listedPrice;
+        }
+
+        return 0.0;
     }
 }

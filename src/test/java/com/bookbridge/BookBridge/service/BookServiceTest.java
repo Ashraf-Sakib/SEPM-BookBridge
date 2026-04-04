@@ -98,4 +98,20 @@ class BookServiceTest {
 
         verify(bookRepository).deleteById(10);
     }
+
+    @Test
+    void convertToResponse_shouldHandleNullAddedBy() {
+        Book bookWithoutSeller = new Book();
+        bookWithoutSeller.setId(11);
+        bookWithoutSeller.setTitle("Test Book");
+        bookWithoutSeller.setAuthor("Test Author");
+        bookWithoutSeller.setAddedBy(null);
+
+        when(bookRepository.findById(11)).thenReturn(Optional.of(bookWithoutSeller));
+
+        BookResponse response = bookService.getBookById(11);
+
+        // This should not throw NPE and addedBy should be null
+        assertNull(response.getAddedBy());
+    }
 }

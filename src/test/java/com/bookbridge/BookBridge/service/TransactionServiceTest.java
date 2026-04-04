@@ -99,6 +99,24 @@ class TransactionServiceTest {
     }
 
     @Test
+    void sellBook_shouldThrowException_whenBookAlreadySold() {
+        book.setAvailable(false);
+        when(bookRepository.findById(1)).thenReturn(Optional.of(book));
+
+        assertThrows(IllegalArgumentException.class, () -> transactionService.sellBook(1, sellRequest));
+    }
+
+    @Test
+    void sellBook_shouldThrowException_whenSellerAndBuyerSame() {
+        sellRequest.setBuyerId(1);
+        when(bookRepository.findById(1)).thenReturn(Optional.of(book));
+        when(userRepository.findById(1)).thenReturn(Optional.of(seller));
+        when(transactionRepository.existsByBookId(1)).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> transactionService.sellBook(1, sellRequest));
+    }
+
+    @Test
     void sellBook_shouldCreateTransaction_whenAllDataIsValid() {
         when(bookRepository.findById(1)).thenReturn(Optional.of(book));
         when(userRepository.findById(1)).thenReturn(Optional.of(seller));

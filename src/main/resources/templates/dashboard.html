@@ -66,6 +66,19 @@
             </div>
         </a>
 
+        <a href="/wishlist" style="text-decoration:none">
+            <div class="interactive-card" style="background:#fff;border-radius:10px;padding:24px;
+                        border:1.5px solid #e2e8f0;cursor:pointer">
+                <div style="width:44px;height:44px;border-radius:10px;background:#fefce8;color:#854d0e;display:grid;place-items:center;margin-bottom:10px">
+                    <svg class="hi hi-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m12 20.25-7.5-7.5a4.5 4.5 0 1 1 6.364-6.364L12 7.52l1.136-1.136A4.5 4.5 0 1 1 19.5 12.75l-7.5 7.5z"/>
+                    </svg>
+                </div>
+                <div style="font-weight:600;color:#1a202c;margin-bottom:4px">My Wishlist</div>
+                <div style="font-size:13px;color:#718096">Saved books to revisit later</div>
+            </div>
+        </a>
+
         <!-- Only visible to ADMIN -->
         <a href="/admin" sec:authorize="hasRole('ADMIN')"
            style="text-decoration:none">

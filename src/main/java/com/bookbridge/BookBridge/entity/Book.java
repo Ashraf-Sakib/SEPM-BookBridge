@@ -43,6 +43,10 @@ public class Book {
     @JoinColumn(name = "added_by", nullable = false)
     private User addedBy;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

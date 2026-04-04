@@ -16,4 +16,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     Page<Transaction> findByBuyerId(Integer buyerId, Pageable pageable);
 
     Page<Transaction> findBySellerIdOrBuyerId(Integer sellerId, Integer buyerId, Pageable pageable);
+
+    boolean existsByBookId(Integer bookId);
 }
