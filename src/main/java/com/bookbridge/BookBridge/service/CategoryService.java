@@ -32,7 +32,11 @@ public class CategoryService {
         if (slug == null || slug.isBlank()) {
             return Optional.empty();
         }
-        return categoryRepository.findBySlugIgnoreCase(slug.trim());
+        String normalized = slug.trim();
+        return categoryRepository.findAll().stream()
+                .filter(category -> category.getSlug() != null)
+                .filter(category -> category.getSlug().equalsIgnoreCase(normalized))
+                .findFirst();
     }
 }
 

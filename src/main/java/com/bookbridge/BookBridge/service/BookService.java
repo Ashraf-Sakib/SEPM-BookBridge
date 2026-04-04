@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,12 +61,53 @@ public class BookService {
 
     @Transactional(readOnly = true)
     public PageResponse<BookResponse> getBooksByFilters(String title, String author, String categorySlug, int page, int size) {
-        Page<Book> books = bookRepository.findByFilters(
-                normalizeFilterValue(title),
-                normalizeFilterValue(author),
-                normalizeFilterValue(categorySlug),
-                PageRequest.of(page, size));
-        return convertPageToResponse(books);
+        String normalizedTitle = normalizeFilterValue(title);
+        String normalizedAuthor = normalizeFilterValue(author);
+        String normalizedCategory = normalizeFilterValue(categorySlug);
+
+        List<Book> filtered = bookRepository.findAll().stream()
+                .filter(book -> containsIgnoreCase(book.getTitle(), normalizedTitle))
+                .filter(book -> containsIgnoreCase(book.getAuthor(), normalizedAuthor))
+                .filter(book -> matchesCategorySlug(book, normalizedCategory))
+                .collect(Collectors.toList());
+
+        int total = filtered.size();
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.max(1, size);
+        int from = Math.min(safePage * safeSize, total);
+        int to = Math.min(from + safeSize, total);
+
+        PageResponse<BookResponse> response = new PageResponse<>();
+        response.setContent(filtered.subList(from, to).stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList()));
+        response.setPageNumber(safePage);
+        response.setPageSize(safeSize);
+        response.setTotalElements(total);
+        response.setTotalPages(total == 0 ? 0 : (int) Math.ceil((double) total / safeSize));
+        response.setFirst(safePage == 0);
+        response.setLast(to >= total);
+        return response;
+    }
+
+    private boolean containsIgnoreCase(String source, String filter) {
+        if (filter == null) {
+            return true;
+        }
+        if (source == null) {
+            return false;
+        }
+        return source.toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT));
+    }
+
+    private boolean matchesCategorySlug(Book book, String filterSlug) {
+        if (filterSlug == null) {
+            return true;
+        }
+        if (book.getCategory() == null || book.getCategory().getSlug() == null) {
+            return false;
+        }
+        return book.getCategory().getSlug().equalsIgnoreCase(filterSlug);
     }
 
     @Transactional(readOnly = true)
