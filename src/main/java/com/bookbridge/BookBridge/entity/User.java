@@ -41,6 +41,8 @@ public class User {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    private LocalDateTime disabledAt;
+    private LocalDateTime deletionScheduledAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
