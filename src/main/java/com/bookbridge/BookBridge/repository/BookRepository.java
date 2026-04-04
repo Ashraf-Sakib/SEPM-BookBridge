@@ -10,16 +10,16 @@ import java.util.List;
 import com.bookbridge.BookBridge.entity.Book;
 
 public interface BookRepository extends JpaRepository<Book, Integer> {
-    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN FETCH b.addedBy WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))")
+    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN b.addedBy WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))")
     Page<Book> findByTitleContainingIgnoreCase(@Param("title") String title, Pageable pageable);
 
-    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN FETCH b.addedBy WHERE LOWER(b.author) LIKE LOWER(CONCAT('%', :author, '%'))")
+    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN b.addedBy WHERE LOWER(b.author) LIKE LOWER(CONCAT('%', :author, '%'))")
     Page<Book> findByAuthorContainingIgnoreCase(@Param("author") String author, Pageable pageable);
 
-    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN FETCH b.addedBy LEFT JOIN b.category c WHERE LOWER(c.slug) = LOWER(:slug)")
+    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN b.addedBy LEFT JOIN b.category c WHERE LOWER(c.slug) = LOWER(:slug)")
     Page<Book> findByCategory_Slug(@Param("slug") String slug, Pageable pageable);
 
-    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN FETCH b.addedBy LEFT JOIN b.category c " +
+    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN b.addedBy LEFT JOIN b.category c " +
             "WHERE (:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
             "AND (:author IS NULL OR LOWER(b.author) LIKE LOWER(CONCAT('%', :author, '%'))) " +
             "AND (:categorySlug IS NULL OR LOWER(c.slug) = LOWER(:categorySlug))")
