@@ -1,5 +1,6 @@
 package com.bookbridge.BookBridge.dto.request;
 
+import com.bookbridge.BookBridge.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -17,5 +18,5 @@ public class RegisterRequest {
     @Size(min = 6, max = 100, message = "Password must be at least 6 characters")
     private String password;
 
-    private String role;
+    private Role.RoleName role = Role.RoleName.ROLE_BUYER;
 }

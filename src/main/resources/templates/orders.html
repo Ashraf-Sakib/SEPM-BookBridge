@@ -6,13 +6,26 @@
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container">
-    <h2 style="margin-bottom:8px;color:#1a202c">My Orders</h2>
+    <h2 style="margin-bottom:8px;color:#1a202c;display:flex;align-items:center;gap:10px">
+        <svg class="hi hi-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3.75h1.5l1.636 7.864a2.25 2.25 0 002.205 1.786h8.77a2.25 2.25 0 002.205-1.786L20.25 6.75H6.172"/>
+            <circle cx="9" cy="18.75" r="1.5"/>
+            <circle cx="17.25" cy="18.75" r="1.5"/>
+        </svg>
+        My Orders
+    </h2>
     <p style="color:#718096;margin-bottom:24px">
         Your order history will appear here.
     </p>
 
-    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:20px;color:#4a5568">
-        No orders yet.
+    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:28px;color:#4a5568;display:flex;align-items:center;gap:12px">
+        <span style="width:40px;height:40px;border-radius:10px;background:#eff6ff;color:#1d4ed8;display:grid;place-items:center;flex:0 0 auto">
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l2.25 2.25L15 9.75"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 5.25h15A2.25 2.25 0 0121.75 7.5v9A2.25 2.25 0 0119.5 18.75h-15A2.25 2.25 0 012.25 16.5v-9A2.25 2.25 0 014.5 5.25z"/>
+            </svg>
+        </span>
+        <div>No orders yet.</div>
     </div>
 </div>
 

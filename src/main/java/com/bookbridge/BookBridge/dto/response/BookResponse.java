@@ -22,6 +22,8 @@ public class BookResponse {
     private Double rating;
     private Integer totalPages;
     private Double price;
+    private Double discountPercentage;
+    private Double discountedPrice;
     private Boolean available;
     private BookCondition condition;
     private String addedBy;

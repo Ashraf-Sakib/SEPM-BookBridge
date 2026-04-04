@@ -37,6 +37,8 @@
 
     .bb-eyebrow {
         display: inline-flex;
+        align-items: center;
+        gap: 8px;
         background: var(--green-mid);
         color: var(--green);
         font-size: 12px;
@@ -60,6 +62,7 @@
     }
 
     .bb-hero-actions { display: flex; gap: 10px; }
+    .bb-hero-actions a { display: inline-flex; align-items: center; gap: 8px; }
 
     .bb-btn-primary {
         background: var(--green-light);
@@ -101,6 +104,12 @@
         padding: 20px;
         border-radius: 10px;
     }
+    .bb-step h3 {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
 
     /* CTA */
     .bb-cta {
@@ -124,7 +133,12 @@
 
 <!-- Hero -->
 <div class="bb-hero">
-    <div class="bb-eyebrow">📖 Book Marketplace</div>
+    <div class="bb-eyebrow">
+        <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+        </svg>
+        Book Marketplace
+    </div>
 
     <h1 class="bb-hero-title">
         Buy and sell your old books
@@ -136,12 +150,22 @@
     </p>
 
     <div class="bb-hero-actions" sec:authorize="isAnonymous()">
-        <a href="/register" class="bb-btn-primary">Get Started →</a>
+        <a href="/register" class="bb-btn-primary">
+            Get Started
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0-3.75 3.75M21 12H3"/>
+            </svg>
+        </a>
         <a href="/books" class="bb-btn-secondary">Browse Books</a>
     </div>
 
     <div class="bb-hero-actions" sec:authorize="isAuthenticated()">
-        <a href="/dashboard" class="bb-btn-primary">Go to Dashboard →</a>
+        <a href="/dashboard" class="bb-btn-primary">
+            Go to Dashboard
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0-3.75 3.75M21 12H3"/>
+            </svg>
+        </a>
     </div>
 </div>
 
@@ -151,17 +175,34 @@
 
     <div class="bb-steps">
         <div class="bb-step">
-            <h3>📸 List your book</h3>
+            <h3>
+                <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5A2.25 2.25 0 019 5.25h6A2.25 2.25 0 0117.25 7.5h.75A2.25 2.25 0 0120.25 9.75v6A2.25 2.25 0 0118 18h-12A2.25 2.25 0 013.75 15.75v-6A2.25 2.25 0 016 7.5h.75z"/>
+                    <circle cx="12" cy="12.3" r="2.8"/>
+                </svg>
+                List your book
+            </h3>
             <p>Add a photo, set price, go live fast.</p>
         </div>
 
         <div class="bb-step">
-            <h3>🔍 Browse</h3>
+            <h3>
+                <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <circle cx="11" cy="11" r="6"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-4.2-4.2"/>
+                </svg>
+                Browse
+            </h3>
             <p>Search books by title or author.</p>
         </div>
 
         <div class="bb-step">
-            <h3>🤝 Trade</h3>
+            <h3>
+                <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 12h9m-9 0L4.5 9m3 3-3 3m9-3 3-3m-3 3 3 3"/>
+                </svg>
+                Trade
+            </h3>
             <p>Connect and exchange books easily.</p>
         </div>
     </div>

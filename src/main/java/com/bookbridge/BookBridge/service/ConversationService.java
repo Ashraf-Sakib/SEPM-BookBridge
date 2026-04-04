@@ -10,6 +10,7 @@ import com.bookbridge.BookBridge.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,16 @@ public class ConversationService {
         return conversationRepository.save(conversation);
     }
 
+    @Transactional
+    public Conversation findOrCreateConversation(Integer bookId, Integer userId, String message) {
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+
+        return conversationRepository
+                .findFirstByUserIdAndBookAddedByIdOrderByUpdatedAtDesc(userId, book.getAddedBy().getId())
+                .orElseGet(() -> createConversation(bookId, userId, message));
+    }
+
     @Transactional(readOnly = true)
     public Conversation getConversationById(Integer conversationId) {
         return conversationRepository.findById(conversationId)
@@ -44,12 +55,12 @@ public class ConversationService {
 
     @Transactional(readOnly = true)
     public Page<Conversation> getConversationsByBookId(Integer bookId, int page, int size) {
-        return conversationRepository.findByBookId(bookId, PageRequest.of(page, size));
+        return conversationRepository.findByBookId(bookId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt")));
     }
 
     @Transactional(readOnly = true)
     public Page<Conversation> getConversationsByUserId(Integer userId, int page, int size) {
-        return conversationRepository.findByUserId(userId, PageRequest.of(page, size));
+        return conversationRepository.findByUserId(userId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt")));
     }
 
     @Transactional(readOnly = true)
@@ -57,7 +68,7 @@ public class ConversationService {
         return conversationRepository.findByUserIdOrBookAddedById(
                 userId,
                 userId,
-                PageRequest.of(page, size));
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt")));
     }
 
     @Transactional

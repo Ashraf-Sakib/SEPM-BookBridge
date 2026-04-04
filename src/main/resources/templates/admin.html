@@ -6,13 +6,25 @@
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container">
-    <h2 style="margin-bottom:8px;color:#1a202c">Admin Panel</h2>
+    <h2 style="margin-bottom:8px;color:#1a202c;display:flex;align-items:center;gap:10px">
+        <svg class="hi hi-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h3m-6.87 1.907l2.122 1.224m8.496 4.905l2.122 1.224m-12.74 0l2.122-1.224m8.496-4.905l2.122-1.224M12 3v2.25m0 13.5V21m-6.364-3.864l1.59-1.59m10.548-7.094l1.59-1.59M3 12h2.25m13.5 0H21m-3.226 5.136l-1.59-1.59M7.226 8.452l-1.59-1.59"/>
+            <circle cx="12" cy="12" r="2.5"/>
+        </svg>
+        Admin Panel
+    </h2>
     <p style="color:#718096;margin-bottom:24px">
         Manage users and listings from here.
     </p>
 
-    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:20px;color:#4a5568">
-        Admin tools are available in upcoming updates.
+    <div style="background:#fff;border:1.5px solid #fbcfe8;border-radius:14px;padding:28px;color:#4a5568;display:flex;align-items:center;gap:12px">
+        <span style="width:40px;height:40px;border-radius:10px;background:#fef2f2;color:#b91c1c;display:grid;place-items:center;flex:0 0 auto">
+            <svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-1.125c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5h.008v.008H12z"/>
+            </svg>
+        </span>
+        <div>Admin tools are available in upcoming updates.</div>
     </div>
 </div>
 

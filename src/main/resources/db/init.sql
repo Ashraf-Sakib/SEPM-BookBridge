@@ -1,0 +1,1 @@
+-- Optional seed script for environments that prefer db/init.sql organization.

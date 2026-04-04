@@ -41,7 +41,7 @@ public class SecurityConfig {
                                 "/", "/register", "/login",
                                 "/books", "/books/**",
                                 "/api/books", "/api/books/**",
-                                "/css/**", "/js/**", "/images/**", "/error"
+                                "/css/**", "/js/**", "/images/**", "/uploads/**", "/error"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "BUYER", "SELLER")

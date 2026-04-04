@@ -1,13 +1,18 @@
 package com.bookbridge.BookBridge.controller;
 
+import com.bookbridge.BookBridge.dto.response.ChatThreadView;
 import com.bookbridge.BookBridge.dto.response.UserResponse;
+import com.bookbridge.BookBridge.entity.Book;
 import com.bookbridge.BookBridge.entity.Conversation;
 import com.bookbridge.BookBridge.entity.Message;
+import com.bookbridge.BookBridge.service.BookService;
 import com.bookbridge.BookBridge.service.ConversationService;
 import com.bookbridge.BookBridge.service.MessageService;
 import com.bookbridge.BookBridge.service.UserService;
 import java.security.Principal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -27,6 +32,7 @@ public class ChatController {
     private final ConversationService conversationService;
     private final MessageService messageService;
     private final UserService userService;
+    private final BookService bookService;
 
     @GetMapping({"/chat", "/chat/{conversationId}"})
     public String showChat(
@@ -39,13 +45,14 @@ public class ChatController {
         }
 
         UserResponse currentUser = userService.getUserByUsername(principal.getName());
-        List<Conversation> conversations = conversationService
+        List<Conversation> accessibleConversations = conversationService
                 .getAccessibleConversations(currentUser.getId(), 0, CONVERSATION_PAGE_SIZE)
                 .getContent();
+        List<ChatThreadView> conversations = buildConversationThreads(accessibleConversations, currentUser.getId());
 
         Conversation activeConversation = conversationId != null
                 ? conversationService.getConversationById(conversationId)
-                : conversations.stream().findFirst().orElse(null);
+            : accessibleConversations.stream().findFirst().orElse(null);
 
         if (activeConversation != null) {
             boolean canAccess = activeConversation.getUser().getId().equals(currentUser.getId())
@@ -68,7 +75,8 @@ public class ChatController {
         model.addAttribute("currentUserId", currentUser.getId());
         model.addAttribute("activeUser", activeConversation == null
                 ? "Messages"
-                : activeConversation.getBook().getTitle());
+                : "Chat with " + resolveParticipantName(activeConversation, currentUser.getId()));
+        model.addAttribute("conversations", conversations);
 
         return "chat";
     }
@@ -88,5 +96,78 @@ public class ChatController {
         messageService.createMessage(conversationId, currentUser.getId(), content);
         redirectAttributes.addFlashAttribute("successMessage", "Message sent.");
         return "redirect:/chat/" + conversationId;
+    }
+
+    @PostMapping("/chat/start")
+    public String startConversation(
+            @RequestParam Integer bookId,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
+
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        UserResponse currentUser = userService.getUserByUsername(principal.getName());
+        Book book = bookService.getBookEntityById(bookId);
+
+        if (currentUser.getUsername().equals(book.getAddedBy().getUsername())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You cannot start a chat on your own book.");
+            return "redirect:/books";
+        }
+
+        Conversation conversation = conversationService.findOrCreateConversation(
+                bookId,
+                currentUser.getId(),
+                "Hi, is this book still available?");
+
+        redirectAttributes.addFlashAttribute("successMessage", "Conversation opened.");
+        return "redirect:/chat/" + conversation.getId();
+    }
+
+    private List<ChatThreadView> buildConversationThreads(List<Conversation> conversations, Integer currentUserId) {
+        Map<Integer, ChatThreadView> threadByParticipant = new LinkedHashMap<>();
+
+        for (Conversation conversation : conversations) {
+            Integer participantId = resolveParticipantId(conversation, currentUserId);
+            if (participantId == null || threadByParticipant.containsKey(participantId)) {
+                continue;
+            }
+
+            threadByParticipant.put(participantId, new ChatThreadView(
+                    conversation.getId(),
+                    resolveParticipantName(conversation, currentUserId),
+                    resolvePreviewText(conversation)));
+        }
+
+        return List.copyOf(threadByParticipant.values());
+    }
+
+    private Integer resolveParticipantId(Conversation conversation, Integer currentUserId) {
+        if (conversation.getUser().getId().equals(currentUserId)) {
+            return conversation.getBook().getAddedBy().getId();
+        }
+
+        if (conversation.getBook().getAddedBy().getId().equals(currentUserId)) {
+            return conversation.getUser().getId();
+        }
+
+        return null;
+    }
+
+    private String resolveParticipantName(Conversation conversation, Integer currentUserId) {
+        if (conversation.getUser().getId().equals(currentUserId)) {
+            return conversation.getBook().getAddedBy().getUsername();
+        }
+
+        if (conversation.getBook().getAddedBy().getId().equals(currentUserId)) {
+            return conversation.getUser().getUsername();
+        }
+
+        return conversation.getUser().getUsername();
+    }
+
+    private String resolvePreviewText(Conversation conversation) {
+        return conversation.getResponse() != null ? conversation.getResponse() : conversation.getMessage();
     }
 }

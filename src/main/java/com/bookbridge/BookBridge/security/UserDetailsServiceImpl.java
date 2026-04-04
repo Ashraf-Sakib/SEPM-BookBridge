@@ -21,9 +21,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throws UsernameNotFoundException {
 
         User user = userRepository.findByUsername(username)
+                .or(() -> userRepository.findByEmail(username))
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "User not found: " + username));
+                                "User not found for username/email: " + username));
 
         var authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(
