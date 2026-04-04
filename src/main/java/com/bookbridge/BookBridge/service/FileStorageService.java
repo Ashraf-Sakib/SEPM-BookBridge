@@ -63,9 +63,15 @@ public class FileStorageService {
 			return ".jpg";
 		}
 		String extension = originalFileName.substring(dotIndex).toLowerCase();
-		return switch (extension) {
-			case ".jpg", ".jpeg", ".png", ".webp", ".gif" -> extension;
-			default -> ".jpg";
-		};
+		switch (extension) {
+			case ".jpg":
+			case ".jpeg":
+			case ".png":
+			case ".webp":
+			case ".gif":
+				return extension;
+			default:
+				return ".jpg";
+		}
 	}
 }

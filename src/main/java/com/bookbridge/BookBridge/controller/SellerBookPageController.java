@@ -4,6 +4,7 @@ import com.bookbridge.BookBridge.dto.request.BookCreateRequest;
 import com.bookbridge.BookBridge.dto.response.UserResponse;
 import com.bookbridge.BookBridge.entity.Book;
 import com.bookbridge.BookBridge.service.BookService;
+import com.bookbridge.BookBridge.service.CategoryService;
 import com.bookbridge.BookBridge.service.FileStorageService;
 import com.bookbridge.BookBridge.service.UserService;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class SellerBookPageController {
 
     private final BookService bookService;
+    private final CategoryService categoryService;
     private final UserService userService;
     private final FileStorageService fileStorageService;
 
@@ -34,6 +36,7 @@ public class SellerBookPageController {
             request.setAvailable(true);
             model.addAttribute("bookCreateRequest", request);
         }
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "books/sell";
     }
 
@@ -43,9 +46,11 @@ public class SellerBookPageController {
             @Valid @ModelAttribute("bookCreateRequest") BookCreateRequest request,
             BindingResult result,
             Principal principal,
+            Model model,
             RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
+            model.addAttribute("categories", categoryService.getAllCategories());
             return "books/sell";
         }
 
@@ -62,10 +67,20 @@ public class SellerBookPageController {
         book.setPrice(request.getPrice());
         book.setDiscountPercentage(request.getDiscountPercentage());
         book.setAvailable(request.getAvailable() == null ? true : request.getAvailable());
+        if (request.getCategorySlug() != null && !request.getCategorySlug().isBlank()) {
+            var categoryOptional = categoryService.findBySlug(request.getCategorySlug());
+            if (categoryOptional.isEmpty()) {
+                result.rejectValue("categorySlug", "category.invalid", "Selected category is invalid.");
+                model.addAttribute("categories", categoryService.getAllCategories());
+                return "books/sell";
+            }
+            book.setCategory(categoryOptional.get());
+        }
 
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             if (!fileStorageService.isSupportedImage(request.getImage())) {
                 result.rejectValue("image", "image.invalid", "Please upload a JPG, PNG, WEBP, or GIF image.");
+                model.addAttribute("categories", categoryService.getAllCategories());
                 return "books/sell";
             }
             book.setImageUrl(fileStorageService.store(request.getImage()));
@@ -101,11 +116,13 @@ public class SellerBookPageController {
             request.setDiscountPercentage(book.getDiscountPercentage());
             request.setAvailable(book.getAvailable());
             request.setDescription(book.getDescription());
+            request.setCategorySlug(book.getCategory() != null ? book.getCategory().getSlug() : null);
             model.addAttribute("bookCreateRequest", request);
         }
 
         model.addAttribute("bookId", bookId);
         model.addAttribute("existingImageUrl", book.getImageUrl());
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "books/edit";
     }
 
@@ -132,6 +149,7 @@ public class SellerBookPageController {
         if (result.hasErrors()) {
             model.addAttribute("bookId", bookId);
             model.addAttribute("existingImageUrl", existingBook.getImageUrl());
+            model.addAttribute("categories", categoryService.getAllCategories());
             return "books/edit";
         }
 
@@ -142,12 +160,26 @@ public class SellerBookPageController {
         bookDetails.setPrice(request.getPrice());
         bookDetails.setDiscountPercentage(request.getDiscountPercentage());
         bookDetails.setAvailable(request.getAvailable() == null ? true : request.getAvailable());
+        if (request.getCategorySlug() != null && !request.getCategorySlug().isBlank()) {
+            var categoryOptional = categoryService.findBySlug(request.getCategorySlug());
+            if (categoryOptional.isEmpty()) {
+                result.rejectValue("categorySlug", "category.invalid", "Selected category is invalid.");
+                model.addAttribute("bookId", bookId);
+                model.addAttribute("existingImageUrl", existingBook.getImageUrl());
+                model.addAttribute("categories", categoryService.getAllCategories());
+                return "books/edit";
+            }
+            bookDetails.setCategory(categoryOptional.get());
+        } else {
+            bookDetails.setCategory(existingBook.getCategory());
+        }
 
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             if (!fileStorageService.isSupportedImage(request.getImage())) {
                 result.rejectValue("image", "image.invalid", "Please upload a JPG, PNG, WEBP, or GIF image.");
                 model.addAttribute("bookId", bookId);
                 model.addAttribute("existingImageUrl", existingBook.getImageUrl());
+                model.addAttribute("categories", categoryService.getAllCategories());
                 return "books/edit";
             }
             bookDetails.setImageUrl(fileStorageService.store(request.getImage()));

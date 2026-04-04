@@ -79,6 +79,15 @@
         </div>
 
         <div class="form-group" style="margin:0">
+            <label for="categorySlug">Category (optional)</label>
+            <select id="categorySlug" th:field="*{categorySlug}">
+                <option value="">Uncategorized</option>
+                <option th:each="cat : ${categories}" th:value="${cat.slug}" th:text="${cat.name}">Category</option>
+            </select>
+            <div class="field-error" th:if="${#fields.hasErrors('categorySlug')}" th:errors="*{categorySlug}"></div>
+        </div>
+
+        <div class="form-group" style="margin:0">
             <label for="image">Book Image (optional)</label>
             <input id="image" type="file" th:field="*{image}" accept="image/png,image/jpeg,image/webp,image/gif" />
             <small style="color:#718096;font-size:12px">Supported: JPG, PNG, WEBP, GIF (max 5MB). A clear cover photo will show on your listing.</small>

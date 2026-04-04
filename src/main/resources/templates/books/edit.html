@@ -81,6 +81,15 @@
         </div>
 
         <div class="form-group" style="margin:0">
+            <label for="categorySlug">Category (optional)</label>
+            <select id="categorySlug" th:field="*{categorySlug}">
+                <option value="">Uncategorized</option>
+                <option th:each="cat : ${categories}" th:value="${cat.slug}" th:text="${cat.name}">Category</option>
+            </select>
+            <div class="field-error" th:if="${#fields.hasErrors('categorySlug')}" th:errors="*{categorySlug}"></div>
+        </div>
+
+        <div class="form-group" style="margin:0">
             <label for="image">Book Image (optional)</label>
             <input id="image" type="file" th:field="*{image}" accept="image/png,image/jpeg,image/webp,image/gif" />
             <small style="color:#718096;font-size:12px">Supported: JPG, PNG, WEBP, GIF (max 5MB). Upload a new image only if you want to replace the current cover.</small>
@@ -88,6 +97,7 @@
                  style="margin-top:10px;width:180px;height:180px;border-radius:10px;border:1.5px dashed #cbd5e1;background:#f8fafc;display:grid;place-items:center;color:#64748b;font-size:12px;overflow:hidden">
                 <img th:if="${existingImageUrl != null and !#strings.isEmpty(existingImageUrl)}"
                      th:src="${existingImageUrl}"
+                     onerror="this.onerror=null;this.src='/images/book-placeholder.svg';"
                      alt="Current book cover"
                      style="width:100%;height:100%;object-fit:cover"/>
                 <span th:if="${existingImageUrl == null or #strings.isEmpty(existingImageUrl)}">Preview</span>

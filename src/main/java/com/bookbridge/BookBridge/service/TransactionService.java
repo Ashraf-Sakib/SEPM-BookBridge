@@ -34,9 +34,21 @@ public class TransactionService {
             throw new IllegalArgumentException("You can only sell books you have added");
         }
 
+        if (book.getAvailable() == null || !book.getAvailable()) {
+            throw new IllegalArgumentException("Book is already marked as sold");
+        }
+
+        if (transactionRepository.existsByBookId(book.getId())) {
+            throw new IllegalArgumentException("A transaction already exists for this book");
+        }
+
         // Validate buyer exists
         User buyer = userRepository.findById(request.getBuyerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Buyer not found"));
+
+        if (buyer.getId().equals(sellerId)) {
+            throw new IllegalArgumentException("Seller and buyer cannot be the same user");
+        }
 
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Seller not found"));

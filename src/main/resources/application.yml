@@ -30,7 +30,7 @@ server:
   port: 8082
 
 bookbridge:
-  upload-dir: uploads
+  upload-dir: ${BOOKBRIDGE_UPLOAD_DIR:uploads}
   cors:
     allowed-origins: http://localhost:5173,http://localhost:3000
   jwt:

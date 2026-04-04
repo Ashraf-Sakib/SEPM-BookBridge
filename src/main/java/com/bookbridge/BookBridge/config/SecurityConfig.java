@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 "/", "/register", "/login",
                                 "/books", "/books/**",
                                 "/api/books", "/api/books/**",
+                                "/api/categories", "/api/categories/**",
                                 "/css/**", "/js/**", "/images/**", "/uploads/**", "/error"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

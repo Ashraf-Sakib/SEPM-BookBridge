@@ -59,6 +59,16 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
+    public PageResponse<BookResponse> getBooksByFilters(String title, String author, String categorySlug, int page, int size) {
+        Page<Book> books = bookRepository.findByFilters(
+                normalizeFilterValue(title),
+                normalizeFilterValue(author),
+                normalizeFilterValue(categorySlug),
+                PageRequest.of(page, size));
+        return convertPageToResponse(books);
+    }
+
+    @Transactional(readOnly = true)
     public List<BookResponse> getBooksAddedByUser(Integer userId) {
         return bookRepository.findByAddedByIdOrderByCreatedAtDesc(userId)
                 .stream()
@@ -90,6 +100,7 @@ public class BookService {
         if (bookDetails.getDiscountPercentage() != null) book.setDiscountPercentage(bookDetails.getDiscountPercentage());
         if (bookDetails.getAvailable() != null) book.setAvailable(bookDetails.getAvailable());
         if (bookDetails.getCondition() != null) book.setCondition(bookDetails.getCondition());
+        if (bookDetails.getCategory() != null) book.setCategory(bookDetails.getCategory());
 
         Book updatedBook = bookRepository.save(book);
         return convertToResponse(updatedBook);
@@ -130,7 +141,9 @@ public class BookService {
         response.setDiscountedPrice(calculateDiscountedPrice(book.getPrice(), book.getDiscountPercentage()));
         response.setAvailable(book.getAvailable());
         response.setCondition(book.getCondition());
-        response.setAddedBy(book.getAddedBy().getUsername());
+        response.setCategoryName(book.getCategory() != null ? book.getCategory().getName() : null);
+        response.setCategorySlug(book.getCategory() != null ? book.getCategory().getSlug() : null);
+        response.setAddedBy(book.getAddedBy() != null ? book.getAddedBy().getUsername() : null);
         response.setCreatedAt(book.getCreatedAt());
         return response;
     }
@@ -152,6 +165,13 @@ public class BookService {
             return imageUrl;
         }
         return "/" + imageUrl;
+    }
+
+    private String normalizeFilterValue(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
     }
 
     private PageResponse<BookResponse> convertPageToResponse(Page<Book> page) {

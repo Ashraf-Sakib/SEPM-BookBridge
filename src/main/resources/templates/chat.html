@@ -125,6 +125,15 @@
                     <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">Response</div>
                     <div style="background:#dcfce7;border:1px solid #bbf7d0;border-radius:10px;padding:10px 12px;" th:text="${conversation.response}"></div>
                 </div>
+                <form th:if="${canConfirmSale}" th:action="@{/chat/{id}/confirm-sale(id=${conversationId})}" method="post"
+                      style="display:grid;gap:8px;padding-bottom:12px;grid-template-columns:1fr 2fr auto">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="number" name="salePrice" min="0" step="0.01" placeholder="Sale price" class="soft-input" />
+                    <input type="text" name="notes" placeholder="Optional note" class="soft-input" />
+                    <button type="submit" style="background:#166534;color:#fff;border:none;border-radius:8px;padding:10px 12px;font-weight:600;cursor:pointer;white-space:nowrap">
+                        Confirm Sale
+                    </button>
+                </form>
             </div>
 
             <div id="messages" th:if="${conversation != null}"
