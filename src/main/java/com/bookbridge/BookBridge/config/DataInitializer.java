@@ -84,20 +84,40 @@ public class DataInitializer implements CommandLineRunner {
                 return;
             }
 
-            Integer byteaColumns = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM information_schema.columns " +
-                            "WHERE table_schema = 'public' AND table_name = 'category' " +
-                            "AND column_name = 'slug' AND data_type = 'bytea'",
-                    Integer.class
-            );
-
-            if (byteaColumns != null && byteaColumns > 0) {
-                jdbcTemplate.execute("ALTER TABLE category ALTER COLUMN slug TYPE VARCHAR(255) USING convert_from(slug, 'UTF8')");
-                log.info("Migrated category.slug from bytea to varchar on PostgreSQL");
+            String schema = jdbcTemplate.queryForObject("SELECT current_schema()", String.class);
+            if (schema == null || schema.isBlank()) {
+                schema = "public";
             }
+
+            migrateByteaColumn(schema, "category", "slug", "VARCHAR(255)");
+            migrateByteaColumn(schema, "book", "title", "VARCHAR(255)");
+            migrateByteaColumn(schema, "book", "author", "VARCHAR(255)");
         } catch (Exception ex) {
             log.warn("Skipping category.slug migration check: {}", ex.getMessage());
         }
+    }
+
+    private void migrateByteaColumn(String schema, String tableName, String columnName, String targetSqlType) {
+        Integer byteaColumns = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.columns " +
+                        "WHERE table_schema = ? AND table_name = ? " +
+                        "AND column_name = ? AND data_type = 'bytea'",
+                Integer.class,
+                schema,
+                tableName,
+                columnName
+        );
+
+        if (byteaColumns == null || byteaColumns == 0) {
+            return;
+        }
+
+        String qualifiedTable = "\"" + schema + "\".\"" + tableName + "\"";
+        String alterSql = "ALTER TABLE " + qualifiedTable +
+                " ALTER COLUMN \"" + columnName + "\" TYPE " + targetSqlType +
+                " USING convert_from(\"" + columnName + "\", 'UTF8')";
+        jdbcTemplate.execute(alterSql);
+        log.info("Migrated {}.{} from bytea to {}", tableName, columnName, targetSqlType);
     }
 }
 
