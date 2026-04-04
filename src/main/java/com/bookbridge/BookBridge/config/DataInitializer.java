@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Connection;
 import java.util.Set;
 
 @Component
@@ -24,10 +26,13 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     @Transactional
     public void run(String... args) {
+        migrateCategorySlugIfNeeded();
+
         if (roleRepository.count() == 0) {
             roleRepository.save(new Role(null, Role.RoleName.ROLE_ADMIN));
             roleRepository.save(new Role(null, Role.RoleName.ROLE_SELLER));
@@ -70,6 +75,29 @@ public class DataInitializer implements CommandLineRunner {
                 .build());
 
         log.info("Seeded admin account: {}", username);
+    }
+
+    private void migrateCategorySlugIfNeeded() {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            String databaseName = connection.getMetaData().getDatabaseProductName();
+            if (databaseName == null || !databaseName.toLowerCase().contains("postgresql")) {
+                return;
+            }
+
+            Integer byteaColumns = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM information_schema.columns " +
+                            "WHERE table_schema = 'public' AND table_name = 'category' " +
+                            "AND column_name = 'slug' AND data_type = 'bytea'",
+                    Integer.class
+            );
+
+            if (byteaColumns != null && byteaColumns > 0) {
+                jdbcTemplate.execute("ALTER TABLE category ALTER COLUMN slug TYPE VARCHAR(255) USING convert_from(slug, 'UTF8')");
+                log.info("Migrated category.slug from bytea to varchar on PostgreSQL");
+            }
+        } catch (Exception ex) {
+            log.warn("Skipping category.slug migration check: {}", ex.getMessage());
+        }
     }
 }
 
