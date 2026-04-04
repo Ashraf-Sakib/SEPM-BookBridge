@@ -1,12 +1,19 @@
 package com.bookbridge.BookBridge.config;
 
 import com.bookbridge.BookBridge.entity.Category;
+import com.bookbridge.BookBridge.entity.Role;
+import com.bookbridge.BookBridge.entity.User;
 import com.bookbridge.BookBridge.repository.CategoryRepository;
+import com.bookbridge.BookBridge.repository.RoleRepository;
+import com.bookbridge.BookBridge.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -14,10 +21,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataInitializer implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
+        if (roleRepository.count() == 0) {
+            roleRepository.save(new Role(null, Role.RoleName.ROLE_ADMIN));
+            roleRepository.save(new Role(null, Role.RoleName.ROLE_SELLER));
+            roleRepository.save(new Role(null, Role.RoleName.ROLE_BUYER));
+            log.info("Seeded default roles: {}", roleRepository.count());
+        } else {
+            log.info("Roles already present: {}", roleRepository.count());
+        }
+
         if (categoryRepository.count() == 0) {
             categoryRepository.save(new Category(null, "Fiction", "fiction", "Novels and short stories"));
             categoryRepository.save(new Category(null, "Non-Fiction", "non-fiction", "Educational and informative books"));
@@ -29,6 +48,28 @@ public class DataInitializer implements CommandLineRunner {
         } else {
             log.info("Categories already present: {}", categoryRepository.count());
         }
+
+        Role adminRole = roleRepository.findByName(Role.RoleName.ROLE_ADMIN)
+                .orElseThrow(() -> new IllegalStateException("ROLE_ADMIN must exist before seeding admin accounts"));
+
+        seedAdminUser("Abir-49", "abir-49@bookbridge.local", adminRole);
+        seedAdminUser("Ashraful-36", "ashraful-36@bookbridge.local", adminRole);
+    }
+
+    private void seedAdminUser(String username, String email, Role adminRole) {
+        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
+            return;
+        }
+
+        userRepository.save(User.builder()
+                .username(username)
+                .email(email)
+                .password(passwordEncoder.encode("000000"))
+                .enabled(true)
+                .roles(Set.of(adminRole))
+                .build());
+
+        log.info("Seeded admin account: {}", username);
     }
 }
 
