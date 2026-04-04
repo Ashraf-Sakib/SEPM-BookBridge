@@ -26,6 +26,8 @@ public class BookResponse {
     private Double discountedPrice;
     private Boolean available;
     private BookCondition condition;
+    private String categoryName;
+    private String categorySlug;
     private String addedBy;
     private LocalDateTime createdAt;
 }

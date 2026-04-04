@@ -1,7 +1,4 @@
-INSERT INTO roles(name) VALUES ('ROLE_ADMIN') ON CONFLICT (name) DO NOTHING;
-INSERT INTO roles(name) VALUES ('ROLE_SELLER') ON CONFLICT (name) DO NOTHING;
-INSERT INTO roles(name) VALUES ('ROLE_BUYER') ON CONFLICT (name) DO NOTHING;
-
+-- Initialize default categories
 INSERT INTO category(name, slug, description) VALUES ('Fiction', 'fiction', 'Novels and short stories') ON CONFLICT (name) DO NOTHING;
 INSERT INTO category(name, slug, description) VALUES ('Non-Fiction', 'non-fiction', 'Educational and informative books') ON CONFLICT (name) DO NOTHING;
 INSERT INTO category(name, slug, description) VALUES ('Science & Technology', 'science-technology', 'Science, tech, and computing books') ON CONFLICT (name) DO NOTHING;

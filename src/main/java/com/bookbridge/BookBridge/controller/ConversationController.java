@@ -2,10 +2,17 @@ package com.bookbridge.BookBridge.controller;
 
 import com.bookbridge.BookBridge.dto.request.ConversationRequest;
 import com.bookbridge.BookBridge.dto.request.ConversationResponseRequest;
+import com.bookbridge.BookBridge.dto.request.SendMessageRequest;
 import com.bookbridge.BookBridge.dto.response.ConversationResponse;
+import com.bookbridge.BookBridge.dto.response.MessageResponse;
 import com.bookbridge.BookBridge.entity.Conversation;
+import com.bookbridge.BookBridge.entity.Message;
 import com.bookbridge.BookBridge.service.ConversationService;
+import com.bookbridge.BookBridge.service.MessageService;
+import com.bookbridge.BookBridge.service.UserService;
 import jakarta.validation.Valid;
+import java.security.Principal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -19,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 public class ConversationController {
 
     private final ConversationService conversationService;
+    private final MessageService messageService;
+    private final UserService userService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','BUYER','SELLER')")
@@ -78,6 +87,30 @@ public class ConversationController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{conversationId}/messages")
+    @PreAuthorize("hasAnyRole('ADMIN','BUYER','SELLER')")
+    public ResponseEntity<List<MessageResponse>> getMessages(
+            @PathVariable Integer conversationId,
+            Principal principal) {
+        Integer currentUserId = userService.getUserByUsername(principal.getName()).getId();
+        List<MessageResponse> messages = messageService.getMessagesByConversationId(conversationId, currentUserId)
+                .stream()
+                .map(this::mapToMessageResponse)
+                .toList();
+        return ResponseEntity.ok(messages);
+    }
+
+    @PostMapping("/{conversationId}/messages")
+    @PreAuthorize("hasAnyRole('ADMIN','BUYER','SELLER')")
+    public ResponseEntity<MessageResponse> sendMessage(
+            @PathVariable Integer conversationId,
+            @Valid @RequestBody SendMessageRequest request,
+            Principal principal) {
+        Integer currentUserId = userService.getUserByUsername(principal.getName()).getId();
+        Message saved = messageService.createMessage(conversationId, currentUserId, request.getContent());
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToMessageResponse(saved));
+    }
+
     private ConversationResponse mapToResponse(Conversation conversation) {
         return new ConversationResponse(
                 conversation.getId(),
@@ -87,5 +120,15 @@ public class ConversationController {
                 conversation.getMessage(),
                 conversation.getResponse(),
                 conversation.getCreatedAt());
+    }
+
+    private MessageResponse mapToMessageResponse(Message message) {
+        return new MessageResponse(
+                message.getId(),
+                message.getConversation().getId(),
+                message.getSender().getId(),
+                message.getSender().getUsername(),
+                message.getContent(),
+                message.getCreatedAt());
     }
 }

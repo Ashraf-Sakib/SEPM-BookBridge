@@ -30,6 +30,9 @@ public class BookCreateRequest {
     @Size(max = 1000, message = "Description must be at most 1000 characters")
     private String description;
 
+    @Size(max = 255, message = "Category slug must be at most 255 characters")
+    private String categorySlug;
+
     private MultipartFile image;
 
 }

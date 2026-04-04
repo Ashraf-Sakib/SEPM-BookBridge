@@ -75,7 +75,7 @@ class BookControllerIntegrationTest {
         pageResponse.setFirst(true);
         pageResponse.setLast(true);
 
-        when(bookService.getAllBooks(0, 12)).thenReturn(pageResponse);
+        when(bookService.getBooksByFilters(null, null, null, 0, 12)).thenReturn(pageResponse);
 
         mockMvc.perform(get("/books"))
                 .andExpect(status().isOk())
