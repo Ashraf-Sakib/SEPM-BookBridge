@@ -10,9 +10,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.bookbridge.BookBridge.dto.response.UserResponse;
 import com.bookbridge.BookBridge.entity.Book;
+import com.bookbridge.BookBridge.entity.User;
 import com.bookbridge.BookBridge.service.BookService;
 import com.bookbridge.BookBridge.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -60,5 +62,27 @@ class SellerBookPageControllerIntegrationTest {
                 .andExpect(redirectedUrl("/books"));
 
         verify(bookService).createBook(any(Book.class), eq(1));
+    }
+
+    @Test
+    void showEditBookForm_shouldReturn200_forOwner() throws Exception {
+        User owner = new User();
+        owner.setId(1);
+        owner.setUsername("seller");
+
+        Book book = new Book();
+        book.setId(10);
+        book.setTitle("Clean Code");
+        book.setAuthor("Robert C. Martin");
+        book.setAddedBy(owner);
+
+        when(userService.getUserByUsername("seller"))
+                .thenReturn(new UserResponse(1, "seller", "seller@test.com", true));
+        when(bookService.getBookEntityById(10)).thenReturn(book);
+
+        mockMvc.perform(get("/seller/books/10/edit")
+                        .with(user("seller").roles("SELLER")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("books/edit"));
     }
 }

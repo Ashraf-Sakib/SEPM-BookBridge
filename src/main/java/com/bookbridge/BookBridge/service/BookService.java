@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +28,7 @@ public class BookService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         book.setAddedBy(user);
+        book.setImageUrl(normalizeImageUrl(book.getImageUrl()));
         Book savedBook = bookRepository.save(book);
         return convertToResponse(savedBook);
     }
@@ -56,6 +58,20 @@ public class BookService {
         return convertPageToResponse(books);
     }
 
+    @Transactional(readOnly = true)
+    public List<BookResponse> getBooksAddedByUser(Integer userId) {
+        return bookRepository.findByAddedByIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Book getBookEntityById(Integer bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+    }
+
     @Transactional
     public BookResponse updateBook(Integer bookId, Book bookDetails) {
         Book book = bookRepository.findById(bookId)
@@ -67,15 +83,26 @@ public class BookService {
         if (bookDetails.getIsbn() != null) book.setIsbn(bookDetails.getIsbn());
         if (bookDetails.getPublisher() != null) book.setPublisher(bookDetails.getPublisher());
         if (bookDetails.getPublishYear() != null) book.setPublishYear(bookDetails.getPublishYear());
-        if (bookDetails.getImageUrl() != null) book.setImageUrl(bookDetails.getImageUrl());
+        if (bookDetails.getImageUrl() != null) book.setImageUrl(normalizeImageUrl(bookDetails.getImageUrl()));
         if (bookDetails.getRating() != null) book.setRating(bookDetails.getRating());
         if (bookDetails.getTotalPages() != null) book.setTotalPages(bookDetails.getTotalPages());
         if (bookDetails.getPrice() != null) book.setPrice(bookDetails.getPrice());
+        if (bookDetails.getDiscountPercentage() != null) book.setDiscountPercentage(bookDetails.getDiscountPercentage());
         if (bookDetails.getAvailable() != null) book.setAvailable(bookDetails.getAvailable());
         if (bookDetails.getCondition() != null) book.setCondition(bookDetails.getCondition());
 
         Book updatedBook = bookRepository.save(book);
         return convertToResponse(updatedBook);
+    }
+
+    @Transactional
+    public BookResponse updateBookForOwner(Integer bookId, Integer userId, Book bookDetails) {
+        Book book = getBookEntityById(bookId);
+        if (book.getAddedBy() == null || !book.getAddedBy().getId().equals(userId)) {
+            throw new ResourceNotFoundException("Book not found");
+        }
+
+        return updateBook(bookId, bookDetails);
     }
 
     @Transactional
@@ -95,15 +122,36 @@ public class BookService {
         response.setIsbn(book.getIsbn());
         response.setPublisher(book.getPublisher());
         response.setPublishYear(book.getPublishYear());
-        response.setImageUrl(book.getImageUrl());
+        response.setImageUrl(normalizeImageUrl(book.getImageUrl()));
         response.setRating(book.getRating());
         response.setTotalPages(book.getTotalPages());
         response.setPrice(book.getPrice());
+        response.setDiscountPercentage(book.getDiscountPercentage());
+        response.setDiscountedPrice(calculateDiscountedPrice(book.getPrice(), book.getDiscountPercentage()));
         response.setAvailable(book.getAvailable());
         response.setCondition(book.getCondition());
         response.setAddedBy(book.getAddedBy().getUsername());
         response.setCreatedAt(book.getCreatedAt());
         return response;
+    }
+
+    private Double calculateDiscountedPrice(Double price, Double discountPercentage) {
+        if (price == null || discountPercentage == null) {
+            return null;
+        }
+
+        double discountedPrice = price - (price * discountPercentage / 100.0);
+        return Math.max(0.0, discountedPrice);
+    }
+
+    private String normalizeImageUrl(String imageUrl) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return imageUrl;
+        }
+        if (imageUrl.startsWith("/") || imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+            return imageUrl;
+        }
+        return "/" + imageUrl;
     }
 
     private PageResponse<BookResponse> convertPageToResponse(Page<Book> page) {

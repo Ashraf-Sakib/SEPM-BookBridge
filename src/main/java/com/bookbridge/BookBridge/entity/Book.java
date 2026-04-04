@@ -33,6 +33,7 @@ public class Book {
     private Double rating;
     private Integer totalPages;
     private Double price;
+    private Double discountPercentage;
     private Boolean available = true;
 
     @Enumerated(EnumType.STRING)
